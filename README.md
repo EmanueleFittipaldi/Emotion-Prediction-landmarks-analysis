@@ -80,6 +80,11 @@ La prima cosa da fare è **Preparare il dataset di caratteristiche (features)**:
 
 La seconda cosa da fare è la vera e propria **predizione dell'espressione**
 Questa fase della risoluzione può essere affrontata in due modi:
+1. Classificazione: costruire delle classi di percentuale (Bucket technique) ovvero delle classi (10-30;30-50;50-70;70-10) per le espressioni. Il problema diventa quindi una classificazione multiclasse, dove le percentuali più basse individuano la micro-espressione e le più alte la macro-espressione.
+2. Regressione: il valore percentuale è ottenuto mediante regressione dei valori esistenti. Avendo un numero diverso di frame in ogni cartella del dataset, non avremo tutti i possibili valori percentuali.
+
+
+
 
 
 
