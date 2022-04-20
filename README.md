@@ -56,8 +56,30 @@ Il Dataset che sarà utilizzato è il Cohn-Kanade Espression Dataset (CK+). Esso
 - Ogni video legato ad una espressione diversa del soggetto è a sua volta in una            sottocartella il cui nome è l'espressione facciale.
 
 Note: 
-- per ogni soggetto non è detto che ci siano state rappresentate tutte e 8 le espressioni facciali.
+- Per ogni soggetto non è detto che ci siano state rappresentate tutte e 8 le espressioni facciali.
 - Non vanno usati gli stessi soggetti in fase di training e di testing (ovviamente per evitare overfitting)
+
+## Pipeline di lavoro
+
+### Features
+
+Le feature che saranno utilizzate per predire la percentuale di espressione sono le distanze tra i landmark in frame consecutivi.
+
+Saranno creati due array di distanze:
+- un array di distanze dei landmark rispetto al frame precedente. Questo vettore ci fornisce la variazione parziale.
+- un array di distanze dei landmark rispetto al frame iniziale. Questo vettore ci fornisce la variazione globale.
+
+### Passaggi da effettuare
+
+La prima cosa da fare è **Preparare il dataset di caratteristiche (features)**:
+1. Per ogni video di espressione facciale di un soggetto, estrapolare i frame (da decidere se tutti i frame o solo un sottoinsieme) ed estrapolare i 468 landmark mediante mediapipe da questi frame ed inserirli in un csv.
+2. All'interno dello stesso csv costruire il vettore delle distanze locali(ogni frame dal precedente, il primo avrà distanze 0) e quello delle distanze globali (ogni frame dal primo, i l primo avrà distanze 0). 
+3. Associare ad ogni array l'etichettature relativa all'espressione
+4. A seconda di come si deciderà di risolvere il problema, si potrebbe associare ad ogni riga una percentuale o una classe di percentuale di espressione.
+
+
+La seconda cosa da fare è la vera e propria **predizione dell'espressione**
+Questa fase della risoluzione può essere affrontata in due modi:
 
 
 
