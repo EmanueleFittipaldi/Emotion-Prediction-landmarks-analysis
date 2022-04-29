@@ -1,10 +1,11 @@
 import os
 import mediap_util as mpu
 import cv2
+import Helper as hp
 from multiprocessing import Pool, cpu_count
 
 # path del dataset CK+
-path_dataset = "/Users/paoloplomipc/PycharmProjects/Emotion_Prediction_Project/src/Dataset/cohn-kanade-images"
+path_dataset = hp.getFromEnv('DatasetPath')
 
 # struttura dati che contiene i path delle singole directory di ogni singolo soggetto
 Dataset_folders = []
