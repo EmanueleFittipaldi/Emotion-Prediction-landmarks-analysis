@@ -35,9 +35,10 @@ for file in os.listdir(path_globaldcsv)[:1]:
         print(csv)
         current_csv = pd.read_csv(csv)
         for i in range(len(first_csv)):
-            distance = spatial.distance.euclidean(
-                [first_csv.at[i, 'x'], first_csv.at[i, 'y'], first_csv.at[i, 'z']],
-                [current_csv.at[i, 'x'], current_csv.at[i, 'y'], current_csv.at[i, 'z']])
-            print(distance)
+            # distance = spatial.distance.euclidean(
+            #     [first_csv.at[i, 'x'], first_csv.at[i, 'y'], first_csv.at[i, 'z']],
+            #     [current_csv.at[i, 'x'], current_csv.at[i, 'y'], current_csv.at[i, 'z']])
+            print(list(first_csv.iloc[i]))
+            print(list(current_csv.iloc[i]))
 
 
