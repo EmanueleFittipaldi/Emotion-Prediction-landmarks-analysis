@@ -2,43 +2,60 @@ import os
 import csv
 import pandas as pd
 from scipy import spatial
+# calcolo delle ditanze globali per ogni sequenza video
+# la distanza globale è calcolata su ogni frame rispetto al primo della sequenza
 path_fcsv = "frames_csv"
 path_globaldcsv = "global_distances_csv"
 
+# creazione cartella principale se non esiste già
 if not os.path.exists(path_globaldcsv):
     os.mkdir(path_globaldcsv)
 
+# loop per creare csv per ogni emozione di ogni soggeto
 for file in os.listdir(path_fcsv):
     if file.startswith("."): continue
-    csv_name = file[0:4] + "_" + file[5:8] + "_GlobalDistances.csv"
+    # path formato da: SXXX_XXX_GD_(nome distanza).csv
+    # SXXX rappresenta il soggetto, XXX rappresenta l'emozione
+    csv_name = file[0:4] + "_" + file[5:8] + "_GD_euclidean.csv"
+    # path completo con directory
     path_file = os.path.join(path_globaldcsv, csv_name)
+    # se il csv non esiste viene creato e aggiunta la prima riga con tutte le distanze a 0
     if not os.path.exists(path_file):
-        # creazione file csv per la singola immagine
+        firstEmptyRow = [0] * 468
         f = open(path_file, 'w')
-        # creazione del writer per scrivere le righe nel csv
         writer = csv.writer(f)
-        firstEmptyRow = [0]*468
-        # scrittura di tutte le righe nel csv
         writer.writerow(firstEmptyRow)
         f.close()
 
-for file in os.listdir(path_globaldcsv)[:1]:
+# loop per prendere i singoli csv creati, inserendo all'interno le distanze calcolate
+for file in os.listdir(path_globaldcsv):
+    # path formato da: SXXX_XXX_GD_(nome distanza).csv
+    # SXXX rappresenta il soggetto, XXX rappresenta l'emozione
     filename = file[0:4] + "_" + file[5:8]
+    # struttura dati che contiene i frame da analizzare di ogni sequenza video divise per soggetto ed emozione
     frameToAnalyze = []
+    # verifico se il frame corrente corrisponde all'emozione XXX del sogetto SXXX (del filename)
     for f in os.listdir(path_fcsv):
         if f.find(filename) != -1:
+            # viene aggiunto tra i frame da analizzare
             frameToAnalyze.append(os.path.join(path_fcsv,f))
     frameToAnalyze = sorted(frameToAnalyze)
-    first_csv = pd.read_csv(frameToAnalyze[0])
-    print(first_csv)
-    for csv in frameToAnalyze[1:]:
-        print(csv)
-        current_csv = pd.read_csv(csv)
-        for i in range(len(first_csv)):
-            # distance = spatial.distance.euclidean(
-            #     [first_csv.at[i, 'x'], first_csv.at[i, 'y'], first_csv.at[i, 'z']],
-            #     [current_csv.at[i, 'x'], current_csv.at[i, 'y'], current_csv.at[i, 'z']])
-            print(list(first_csv.iloc[i]))
-            print(list(current_csv.iloc[i]))
-
+    # costruzione DataFrame del primo frame
+    first_frame = pd.read_csv(frameToAnalyze[0])
+    # loop sui frame successivi al primo
+    for data in frameToAnalyze[1:]:
+        current_frame = pd.read_csv(data)
+        distances = []
+        # calcolo delle distanze
+        for i in range(len(first_frame)):
+            # calcolo distanza euclidea PrimoFrame[cord.x,cord.y,cord.z] e FrameCorrente[cord.x,cord.y,cord.z]
+            dist = spatial.distance.euclidean(list(first_frame.iloc[i]), list(current_frame.iloc[i]))
+            distances.append(dist)
+        # inserimento delle distanze nel csv SXXX_XXX (espresso precedentemente)
+        # frame sulle righe e le distanze sulle colonne
+        path_csv = os.path.join("global_distances_csv/",data[11:20]+"GD_euclidean.csv")
+        f = open(path_csv, "a")
+        writer = csv.writer(f)
+        writer.writerow(distances)
+        f.close()
 
