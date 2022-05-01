@@ -16,7 +16,7 @@ Csv_files = sorted(os.listdir(path_csv))
 # dei landmarks. Questi csv sono tali che la prima riga è sempre composta da 468 colonne poste a 0
 currentSubject = ""
 for frame in Csv_files:
-    if currentSubject is not frame[0:9]: #ogni volta che la sequenza o il soggetto cambia creo un nuovo csv
+    if currentSubject is not frame[0:9]:  # ogni volta che la sequenza o il soggetto cambia creo un nuovo csv
         currentSubject = frame[0:9]
 
         # Creo il nuovo csv e.g. Local_Distance/S005_001_LocalDistances.csv
@@ -33,7 +33,7 @@ for frame in Csv_files:
 # Per ogni csv di distanze locali devo analizzare tutti i frame di
 # quella sequenza e devo scrivere i risultati in quel csv
 for VideoSequence in sorted(os.listdir(hp.getFromEnv('Local_Distances'))):
-    LocalDistance_Df = pd.read_csv("Local_Distances/"+VideoSequence) #apro il csv in un dataframe
+    LocalDistance_Df = pd.read_csv("Local_Distances/"+VideoSequence)  # apro il csv in un dataframe
 
     # lista contenente i nomi dei frame appartenenti alla sequenza video
     # per reperirli scorro tutti i nomi dei frame
@@ -42,36 +42,33 @@ for VideoSequence in sorted(os.listdir(hp.getFromEnv('Local_Distances'))):
         if VideoSequence[0:8] in frame:
             frameToAnalyze.append(frame)
 
+
     # adesso ho tutti frame per quella sequenza, e li apro come dataframe
     # Nota: li apro se contengono qualcosa altrimenti avrei un errore.
-    i=0
-    j=1
-    while(j<len(frameToAnalyze)):
-        previousFrame= os.path.join("frames_csv/",frameToAnalyze[i])
-        currentFrame= os.path.join("frames_csv/",frameToAnalyze[j])
+    i = 0
+    j = 1
+    while j < len(frameToAnalyze):
+        previousFrame= os.path.join("frames_csv/", frameToAnalyze[i])
+        currentFrame= os.path.join("frames_csv/", frameToAnalyze[j])
 
-        if os.path.getsize(previousFrame) ==0:
-            print(previousFrame)
-        elif os.path.getsize(currentFrame) ==0:
-            print(currentFrame)
+        previousFrame_Df = pd.read_csv(previousFrame)
+        currentFrame_Df = pd.read_csv(currentFrame)
+
+        if len(previousFrame_Df)!=len(currentFrame_Df):
+            print("error")
+            print(previousFrame,currentFrame)
+            print(len(previousFrame_Df),len(currentFrame_Df))
 
 
-
-        # previousFrame_Df = pd.read_csv(previousFrame)
-        # currentFrame_Df = pd.read_csv(currentFrame)
 
         # devo scorrere le righe di entrambi i csv, calcolare la distanza
         # con la libreria di scipy e scrivere il risultato in una colonna
         # del csv delle distanze locali
 
-        # for k in range(len(previousFrame_Df)):
-        #     landmarkPrecedente = previousFrame_Df.iloc[k,]
-        #     landmarkCorrente = currentFrame_Df.iloc[k,]
-        #     print("landmarkPrecedente")
-        #     print(landmarkPrecedente)
-        #     print("landmarkCorrente")
-        #     print(landmarkCorrente)
-        #
+        # for k in range(previousFrame_Df.shape[0]):
+        #     landmarkPrecedente = list(previousFrame_Df.iloc[k])
+        #     landmarkCorrente = list(currentFrame_Df.iloc[k])
+        #     print(distance.euclidean(landmarkPrecedente,landmarkCorrente))
         i+=1
         j+=1
 
