@@ -19,8 +19,9 @@ for frame in Csv_files:
     if currentSubject is not frame[0:9]:  # ogni volta che la sequenza o il soggetto cambia creo un nuovo csv
         currentSubject = frame[0:9]
 
-        # Creo il nuovo csv e.g. Local_Distance/S005_001_LocalDistances.csv
-        filename = 'Local_Distances/'+frame[0:9]+'LocalDistances.csv'
+        # Creo il nuovo csv
+        # filename = 'Local_Distances/' + frame[0:9] + 'LocalDistances.csv' per creare i file contenenti le distanze EUCLIDEE
+        filename = 'Local_Distances/'+frame[0:9]+'LD_manhattan.csv'
         f = open(filename, 'w')
         writer = csv.writer(f)
 

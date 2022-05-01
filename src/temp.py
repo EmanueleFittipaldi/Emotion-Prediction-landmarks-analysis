@@ -1,18 +1,18 @@
 import os
-import Helper as hp
-import land_extractor as lext
-import pandas as pd
-mancanti = []
-csvs= sorted(os.listdir("frames_csv/"))
-
-for csv in csvs:
-    # if os.path.getsize(os.path.join("frames_csv/",csv))==0:
-    df = pd.read_csv(os.path.join("frames_csv/",csv))
-    if len(df) != 468:
-        mancanti.append(csv)
-
-print(len(mancanti))
-print(mancanti)
+# import Helper as hp
+# import land_extractor as lext
+# import pandas as pd
+# mancanti = []
+# csvs= sorted(os.listdir("frames_csv/"))
+#
+# for csv in csvs:
+#     # if os.path.getsize(os.path.join("frames_csv/",csv))==0:
+#     df = pd.read_csv(os.path.join("frames_csv/",csv))
+#     if len(df) != 468:
+#         mancanti.append(csv)
+#
+# print(len(mancanti))
+# print(mancanti)
 #--------------------------------------
 # # path del dataset CK+
 # path_dataset = hp.getFromEnv('DatasetPath')
@@ -38,4 +38,5 @@ print(mancanti)
 #             if x[0:17]==img[0:17]:
 #                 print(x)
 #                 lext.process_landmarks(dir, img)
+
 
