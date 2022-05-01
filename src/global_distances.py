@@ -24,19 +24,20 @@ for file in os.listdir(path_fcsv):
 
 for file in os.listdir(path_globaldcsv)[:1]:
     filename = file[0:4] + "_" + file[5:8]
-    emotion_dir = []
+    frameToAnalyze = []
     for f in os.listdir(path_fcsv):
         if f.find(filename) != -1:
-            emotion_dir.append(os.path.join(path_fcsv,f))
-    emotion_dir = sorted(emotion_dir)
-    first_csv = pd.read_csv(emotion_dir[0])
-    for csv in emotion_dir[1:]:
+            frameToAnalyze.append(os.path.join(path_fcsv,f))
+    frameToAnalyze = sorted(frameToAnalyze)
+    first_csv = pd.read_csv(frameToAnalyze[0])
+    print(first_csv)
+    for csv in frameToAnalyze[1:]:
+        print(csv)
         current_csv = pd.read_csv(csv)
         for i in range(len(first_csv)):
-            distance = spatial.distance.seuclidean(
+            distance = spatial.distance.euclidean(
                 [first_csv.at[i, 'x'], first_csv.at[i, 'y'], first_csv.at[i, 'z']],
-                [current_csv.at[i, 'x'], current_csv.at[i, 'y'], current_csv.at[i, 'z']],
-                [0.1, 0.1, 0.1])
+                [current_csv.at[i, 'x'], current_csv.at[i, 'y'], current_csv.at[i, 'z']])
             print(distance)
 
 
