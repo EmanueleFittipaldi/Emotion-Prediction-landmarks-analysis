@@ -21,7 +21,7 @@ for frame in Csv_files:
 
         # Creo il nuovo csv
         # filename = 'Local_Distances/' + frame[0:9] + 'LocalDistances.csv' per creare i file contenenti le distanze EUCLIDEE
-        filename = 'Local_Distances/'+frame[0:9]+'LD_manhattan.csv'
+        filename = 'manhattan/'+frame[0:9]+'LD_manhattan.csv'
         f = open(filename, 'w')
         writer = csv.writer(f)
 
@@ -33,8 +33,10 @@ for frame in Csv_files:
 
 # Per ogni csv di distanze locali devo analizzare tutti i frame di
 # quella sequenza e devo scrivere i risultati in quel csv
-for VideoSequence in sorted(os.listdir(hp.getFromEnv('Local_Distances'))):
-    LocalDistanceCSV = open("Local_Distances/"+VideoSequence,'a')
+# for VideoSequence in sorted(os.listdir(hp.getFromEnv('Local_Distances'))):
+for VideoSequence in sorted(os.listdir("/Users/emanuelefittipaldi/PycharmProjects/Emotion_Prediction_Project/src/manhattan")):
+    #LocalDistanceCSV = open("Local_Distances/"+VideoSequence,'a')
+    LocalDistanceCSV = open("manhattan/" + VideoSequence, 'a')
     writer = csv.writer(LocalDistanceCSV)
 
     # lista contenente i nomi dei frame appartenenti alla sequenza video
@@ -63,7 +65,8 @@ for VideoSequence in sorted(os.listdir(hp.getFromEnv('Local_Distances'))):
         for k in range(previousFrame_Df.shape[0]):
             landmarkPrecedente = list(previousFrame_Df.iloc[k])
             landmarkCorrente = list(currentFrame_Df.iloc[k])
-            rowOfDistances.append(distance.euclidean(landmarkPrecedente,landmarkCorrente))
+            # rowOfDistances.append(distance.euclidean(landmarkPrecedente,landmarkCorrente))
+            rowOfDistances.append(distance.cityblock(landmarkPrecedente, landmarkCorrente))
         writer.writerow(rowOfDistances)
         i+=1
         j+=1
