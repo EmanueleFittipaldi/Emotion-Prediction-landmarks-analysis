@@ -33,7 +33,7 @@ for frame in Csv_files:
 # Per ogni csv di distanze locali devo analizzare tutti i frame di
 # quella sequenza e devo scrivere i risultati in quel csv
 for VideoSequence in sorted(os.listdir(hp.getFromEnv('Local_Distances'))):
-    df = pd.read_csv("Local_Distances/"+VideoSequence) #apro il csv in un dataframe
+    LocalDistance_Df = pd.read_csv("Local_Distances/"+VideoSequence) #apro il csv in un dataframe
 
     # lista contenente i nomi dei frame appartenenti alla sequenza video
     # per reperirli scorro tutti i nomi dei frame
@@ -44,14 +44,36 @@ for VideoSequence in sorted(os.listdir(hp.getFromEnv('Local_Distances'))):
 
     # adesso ho tutti frame per quella sequenza, e li apro come dataframe
     # Nota: li apro se contengono qualcosa altrimenti avrei un errore.
-    framePath= os.path.join("frames_csv/",frameToAnalyze[0])
-    if os.path.getsize(framePath) !=0:
-          df1 = pd.read_csv(framePath)
-    else:
-        continue
+    i=0
+    j=1
+    while(j<len(frameToAnalyze)):
+        previousFrame= os.path.join("frames_csv/",frameToAnalyze[i])
+        currentFrame= os.path.join("frames_csv/",frameToAnalyze[j])
 
-    # df2 = pd.read_csv(os.path.join("frames_csv/", frameToAnalyze[1]))
-    # print(df1)
+        if os.path.getsize(previousFrame) ==0:
+            print(previousFrame)
+        elif os.path.getsize(currentFrame) ==0:
+            print(currentFrame)
+
+
+
+        # previousFrame_Df = pd.read_csv(previousFrame)
+        # currentFrame_Df = pd.read_csv(currentFrame)
+
+        # devo scorrere le righe di entrambi i csv, calcolare la distanza
+        # con la libreria di scipy e scrivere il risultato in una colonna
+        # del csv delle distanze locali
+
+        # for k in range(len(previousFrame_Df)):
+        #     landmarkPrecedente = previousFrame_Df.iloc[k,]
+        #     landmarkCorrente = currentFrame_Df.iloc[k,]
+        #     print("landmarkPrecedente")
+        #     print(landmarkPrecedente)
+        #     print("landmarkCorrente")
+        #     print(landmarkCorrente)
+        #
+        i+=1
+        j+=1
 
 
 
