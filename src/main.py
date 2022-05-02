@@ -27,7 +27,7 @@ for dir in sorted(Emotion_folders):
 
 f = plt.figure()
 for dir in Dataset_folders:
-    for missing in missing_label[125:]:
+    for missing in missing_label:
         if dir.find(missing[16:]) != -1:
             all_imges = sorted(os.listdir(dir))
             image = cv2.imread(os.path.join(dir,all_imges[len(os.listdir(dir))-1]))
