@@ -1,6 +1,0 @@
-Considerare i 468 landmark come dei "sensori" che rilevano quando si passa da micro a macroespressione.
-Prendere quindi lo split che da la variazione di pvalue massima secondo ogni landmark.
-Vedere poi per maggioranza quale è il frame/split che ha dato la variazione più grande.
-
-Aggiungere le etichette rei sessi
-etichettare i frame delle videosequenze con micro-espressione macro-espressione

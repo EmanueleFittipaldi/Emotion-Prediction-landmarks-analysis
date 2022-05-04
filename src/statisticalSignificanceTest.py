@@ -2,10 +2,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind
+from scipy import stats
 import numpy as np
+import statistics
+from statistics import mode
+from pprint import pprint
 
 # Carico il csv contenente le distanze di una sequenza video da analizzare
-videoSequence = pd.read_csv("/Users/emanuelefittipaldi/PycharmProjects/Emotion_Prediction_Project/src/Local_Distances/S011_005_LD_manhattan.csv")
+videoSequence = pd.read_csv("/Users/emanuelefittipaldi/PycharmProjects/Emotion_Prediction_Project/src/Local_Distances/S072_001_LD_euclidean.csv")
 
 # array contenente la variazione del pvalue in base al frame in cui mi trovo.
 # es. tra il frame 2-3 il pvalue vale 0.80, tra il frame 3-4 il pvalue vale 0.30, etc ...
@@ -27,22 +31,39 @@ videoSequence = pd.read_csv("/Users/emanuelefittipaldi/PycharmProjects/Emotion_P
 # un picco per la prima volta allora siamo passati da micro a macro-espressione.
 Pvalue_history=[]
 splits = list(range(2,len(videoSequence)-1))
+alpha= 0.05
+splitsChangeOccurred = []
+landmarksInvolved = []
 for split in splits:
     # split del dataset
     df_1 = videoSequence.iloc[:split, :]
     df_2 = videoSequence.iloc[split:, :]
-    res = ttest_ind(df_1["0"],df_2["0"]).pvalue # questa è la funzione che presi i due insiemi di dati mi restituisce il pvalue
-    Pvalue_history.append(res)
+    for i in range(1,467):
+        landmark = "0."+str(i)
+        # questa è la funzione che presi i due insiemi di dati mi restituisce il pvalue
+        res = ttest_ind(df_1[landmark],df_2[landmark]).pvalue
+        if res <=alpha:
+            # print("STATISTICAL SIGNIFICANCE DETECTED")
+            # print("pvalue{}, split{}, landmark{}".format(res,split,landmark))
+            splitsChangeOccurred.append(split)
+            landmarksInvolved.append(landmark)
+        Pvalue_history.append(res)
 
-print(Pvalue_history)
-for i in range(0,len(Pvalue_history)-1):
-    print(Pvalue_history[i+1]-Pvalue_history[i])
+print("This is the frame where the major number of landmarks had a significant variation in the distance")
+print(mode(splitsChangeOccurred))
+print("This is the list of the landmark involved in this emotion")
+pprint(landmarksInvolved)
+print(len(landmarksInvolved))
+
+# print(Pvalue_history)
+# for i in range(0,len(Pvalue_history)-1):
+#     print(Pvalue_history[i+1]-Pvalue_history[i])
 
 # Le seguenti righe di codice sono soltanto per plottare a video il grafico della variazione del pvalue
-x = np.array(splits)
-y = np.array(Pvalue_history)
-# plt.xlabel("splits")
-plt.ylabel("pvalue")
-plt.plot(x, y, color = "red", marker = "o", label = "pvalue")
-plt.legend()
-plt.show()
+# x = np.array(splits)
+# y = np.array(Pvalue_history)
+# # plt.xlabel("splits")
+# plt.ylabel("pvalue")
+# plt.plot(x, y, color = "red", marker = "o", label = "pvalue")
+# plt.legend()
+# plt.show()
