@@ -1,15 +1,19 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind
-from scipy import stats
-import numpy as np
-import statistics
 from statistics import mode
-from pprint import pprint
+import numpy as np
+
+def pvaluePlotter(pvalueHistory,splits):
+    x = np.array(splits)
+    y = np.array(Pvalue_history)
+    plt.ylabel("pvalue")
+    plt.plot(x, y, color = "red", marker = "o", label = "pvalue")
+    plt.legend()
+    plt.show()
 
 # Carico il csv contenente le distanze di una sequenza video da analizzare
-videoSequence = pd.read_csv("/Users/emanuelefittipaldi/PycharmProjects/Emotion_Prediction_Project/src/Local_Distances/S072_001_LD_euclidean.csv")
+videoSequence = pd.read_csv("/Users/emanuelefittipaldi/PycharmProjects/Emotion_Prediction_Project/src/Local_Distances/S502_001_LD_euclidean.csv")
 
 # array contenente la variazione del pvalue in base al frame in cui mi trovo.
 # es. tra il frame 2-3 il pvalue vale 0.80, tra il frame 3-4 il pvalue vale 0.30, etc ...
@@ -29,41 +33,38 @@ videoSequence = pd.read_csv("/Users/emanuelefittipaldi/PycharmProjects/Emotion_P
 # macroespressione, calcolo il pvalue e lo memorizzo in Pvalue_history. Faccio questa cosa fino a quando non splitto
 # il dataframe in len-2 frame di microespressione e 2 frame di macroespressione. L'ipotesi è che quando il pvalue raggiunge
 # un picco per la prima volta allora siamo passati da micro a macro-espressione.
-Pvalue_history=[]
+Pvalue_history = [] # lista dei valori che il pvalue ha assunto per ciascun landmark e per ciascun split
+splitsChangeOccurred = [] # lista dei frame in cui è avvenuta una variazione significativa di un landmark
+landmarksInvolved = [] # lista dei landmark che hanno subito una variazione di posizione significativa all'interno della videosequenza
+
 splits = list(range(2,len(videoSequence)-1))
-alpha= 0.05
-splitsChangeOccurred = []
-landmarksInvolved = []
+# Regolare questo valore tra 0.05 e 0.01 per incrementare oppure decrementare la soglia per la quale decretiamo
+# la variazione di posizione di un landmark come significativa oppure no. Mettendo una soglia molto bassa come 0.01
+# otteniamo i landmark che più rappresentativamente hanno oltrepassato la soglia alpha.
+alpha= 0.01
+
 for split in splits:
-    # split del dataset
     df_1 = videoSequence.iloc[:split, :]
     df_2 = videoSequence.iloc[split:, :]
     for i in range(1,467):
         landmark = "0."+str(i)
-        # questa è la funzione che presi i due insiemi di dati mi restituisce il pvalue
         res = ttest_ind(df_1[landmark],df_2[landmark]).pvalue
         if res <=alpha:
             # print("STATISTICAL SIGNIFICANCE DETECTED")
             # print("pvalue{}, split{}, landmark{}".format(res,split,landmark))
             splitsChangeOccurred.append(split)
-            landmarksInvolved.append(landmark)
-        Pvalue_history.append(res)
+            landmarksInvolved.append(int(landmark[2:]))
+            Pvalue_history.append(res)
 
-print("This is the frame where the major number of landmarks had a significant variation in the distance")
+print("\nThis is the frame where the major number of landmarks had a significant variation in the distance")
 print(mode(splitsChangeOccurred))
 print("This is the list of the landmark involved in this emotion")
-pprint(landmarksInvolved)
+landmarksInvolved = set(landmarksInvolved)
+landmarksInvolved = sorted(list(landmarksInvolved))
+print(landmarksInvolved)
 print(len(landmarksInvolved))
 
-# print(Pvalue_history)
-# for i in range(0,len(Pvalue_history)-1):
-#     print(Pvalue_history[i+1]-Pvalue_history[i])
+print("These are the key splits where major significance was detected")
+splitsChangeOccurred =sorted(list(set(splitsChangeOccurred)))
+print(splitsChangeOccurred)
 
-# Le seguenti righe di codice sono soltanto per plottare a video il grafico della variazione del pvalue
-# x = np.array(splits)
-# y = np.array(Pvalue_history)
-# # plt.xlabel("splits")
-# plt.ylabel("pvalue")
-# plt.plot(x, y, color = "red", marker = "o", label = "pvalue")
-# plt.legend()
-# plt.show()
