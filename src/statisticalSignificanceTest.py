@@ -13,7 +13,7 @@ def pvaluePlotter(pvalueHistory,splits):
     plt.show()
 
 # Carico il csv contenente le distanze di una sequenza video da analizzare
-videoSequence = pd.read_csv("/Users/emanuelefittipaldi/PycharmProjects/Emotion_Prediction_Project/src/Local_Distances/S502_001_LD_euclidean.csv")
+videoSequence = pd.read_csv("Local_Distances/S502_001_LD_euclidean.csv")
 
 # array contenente la variazione del pvalue in base al frame in cui mi trovo.
 # es. tra il frame 2-3 il pvalue vale 0.80, tra il frame 3-4 il pvalue vale 0.30, etc ...
