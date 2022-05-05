@@ -2,6 +2,7 @@ import os
 import csv
 import pandas as pd
 from scipy import spatial
+
 # calcolo delle ditanze globali per ogni sequenza video
 # la distanza globale è calcolata su ogni frame rispetto al primo della sequenza
 path_fcsv = "frames_csv"
