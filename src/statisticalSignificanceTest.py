@@ -1,6 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.stats import ttest_ind
+from scipy import stats
 from statistics import mode
 import numpy as np
 
@@ -12,8 +12,21 @@ def pvaluePlotter(pvalueHistory,splits):
     plt.legend()
     plt.show()
 
+
+def normalTest(values):
+    stat, p2 = stats.normaltest(values)
+    alpha = 1e-3
+    # print("p = {}".format(p2))
+    if p2 < alpha:
+        # print("the null hp can be rejected")
+        return 1
+    else:
+        # print("the null hp cannot be rejected")
+        return 0
+
+
 # Carico il csv contenente le distanze di una sequenza video da analizzare
-videoSequence = pd.read_csv("Local_Distances/S502_001_LD_euclidean.csv", header=None)
+videoSequence = pd.read_csv("Local_Distances/S506_001_LD_euclidean.csv", header=None)
 
 # array contenente la variazione del pvalue in base al frame in cui mi trovo.
 # es. tra il frame 2-3 il pvalue vale 0.80, tra il frame 3-4 il pvalue vale 0.30, etc ...
@@ -41,15 +54,44 @@ splits = list(range(2,len(videoSequence)-1))
 # Regolare questo valore tra 0.05 e 0.01 per incrementare oppure decrementare la soglia per la quale decretiamo
 # la variazione di posizione di un landmark come significativa oppure no. Mettendo una soglia molto bassa come 0.01
 # otteniamo i landmark che più rappresentativamente hanno oltrepassato la soglia alpha.
-alpha= 0.01
+
+# Grafici per visualizzare l'andamento dei dati dopo averli normalizzati
+# data = videoSequence.iloc[1:, :1]
+# plt.hist(data)
+# plt.show()
+# plt.hist(np.log(data))
+# plt.show()
+
+print(videoSequence)
+# Per poter applicare il test di significatività su ciascun landmark abbiamo bisogno che le distanze registrate seguino
+# una distribuzione normale (gaussiana) altrimenti non è possibile applicarlo.
+# senza la normalizzazione abbiamo riscontrato in media 150 landmark che non seguivano una distribuzione normale.
+# dopo la trasformazione abbiamo ridotto il numero a circa 20 landmark, non è possibile migliorarlo
+# poiché le distanze registrate non sono di un numero sufficientemente ampie
+# plt.hist(videoSequence.iloc[1:, 3:4])
+# plt.show()
+outlier = []
+for i in range(0,len(videoSequence.columns)-2):
+    data = videoSequence.iloc[1:, i:i+1]
+    videoSequence.iloc[1:, i:i+1] = abs(np.log(data))
+    if normalTest(videoSequence.iloc[1:, i:i+1]):
+        outlier.append(i)
+print("Numero di landmark non normalizzati: {}, landmark: {}".format(len(outlier), outlier))
+# plt.hist(videoSequence.iloc[1:, 3:4])
+# plt.show()
+
+print(videoSequence)
+
+
+alpha = 0.01
 
 for split in splits:
     df_1 = videoSequence.iloc[:split, :]
     df_2 = videoSequence.iloc[split:, :]
     for i in range(0,467):
         landmark = i
-        res = ttest_ind(df_1[landmark],df_2[landmark]).pvalue
-        if res <=alpha:
+        res = stats.ttest_ind(df_1[landmark],df_2[landmark]).pvalue
+        if res <= alpha:
             # print("STATISTICAL SIGNIFICANCE DETECTED")
             # print("pvalue{}, split{}, landmark{}".format(res,split,landmark))
             splitsChangeOccurred.append(split)
