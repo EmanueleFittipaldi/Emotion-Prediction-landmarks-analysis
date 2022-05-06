@@ -13,7 +13,7 @@ def pvaluePlotter(pvalueHistory,splits):
     plt.show()
 
 # Carico il csv contenente le distanze di una sequenza video da analizzare
-videoSequence = pd.read_csv("Local_Distances/S502_001_LD_euclidean.csv")
+videoSequence = pd.read_csv("Local_Distances/S502_001_LD_euclidean.csv", header=None)
 
 # array contenente la variazione del pvalue in base al frame in cui mi trovo.
 # es. tra il frame 2-3 il pvalue vale 0.80, tra il frame 3-4 il pvalue vale 0.30, etc ...
@@ -46,14 +46,14 @@ alpha= 0.01
 for split in splits:
     df_1 = videoSequence.iloc[:split, :]
     df_2 = videoSequence.iloc[split:, :]
-    for i in range(1,467):
-        landmark = "0."+str(i)
+    for i in range(0,467):
+        landmark = i
         res = ttest_ind(df_1[landmark],df_2[landmark]).pvalue
         if res <=alpha:
             # print("STATISTICAL SIGNIFICANCE DETECTED")
             # print("pvalue{}, split{}, landmark{}".format(res,split,landmark))
             splitsChangeOccurred.append(split)
-            landmarksInvolved.append(int(landmark[2:]))
+            landmarksInvolved.append(landmark)
             Pvalue_history.append(res)
 
 print("\nThis is the frame where the major number of landmarks had a significant variation in the distance")
