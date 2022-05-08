@@ -26,6 +26,10 @@ splits = list(range(2,len(videoSequence)-1))
 # histogramPlotter(normalized)
 
 
+# Per ogni landmark, prendo tutti i valori della colonna, li normalizzo, li porto in valore assoluto e li
+# memorizzo nella stessa colonna. Conduco poi il test di normalità per vedere se adesso tutte le misure per quel
+# landmark segue una distribuzione normale. Se non la segue allora lo inserisco nella lista degli "outlier"
+
 for i in range(0,len(videoSequence.columns)-2):
     data = videoSequence.iloc[1:, i:i+1]
     videoSequence.iloc[1:, i:i+1] = abs(np.log(data))
@@ -50,6 +54,7 @@ for split in splits:
 # STATS PRINTING
 print("\nThis is the frame where the major number of landmarks had a significant variation in the distance")
 print(mode(splitsChangeOccurred))
+
 
 print("This is the list of the landmark involved in this emotion")
 landmarksInvolved = set(landmarksInvolved)
