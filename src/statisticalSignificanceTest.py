@@ -1,62 +1,6 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-from scipy import stats
 from statistics import mode
-import numpy as np
-
-
-def pvaluePlotter(Pvalue_history,splits):
-    """
-    This Function takes a list of pvalues and a list of splits where these pvalues where calculated and
-    creates a plot showing how pvalue changed according to the several splits.
-        - **Returns**: nothing
-
-        - Parameter **Pvalue_history**: a list of pvalues
-
-        - Parameter **splits**: a list of the split points where the pvalues where valuated
-
-        - **Precondition**: Pvalue_history and splits are lists of numbers
-    """
-    x = np.array(splits)
-    y = np.array(Pvalue_history)
-    plt.ylabel("pvalue")
-    plt.plot(x, y, color = "red", marker = "o", label = "pvalue")
-    plt.legend()
-    plt.show()
-def histogramPlotter(data):
-    plt.hist(data)
-    plt.show()
-def normalTest(values):
-    """
-    This function takes a list of numerical values and conduct a normal test over these values returning a p2 value.
-    If this value is less than alpha, we conclude that the values were not drawn from a normal distribuition.
-
-    - **Returns**: 1 if we can reject the null hypotesis, meaning that the values were not drawn from a normal distribuition,otherwise we return 0, meaning that the values were drawn from a normal distribuition.
-    - **Value return** has type int.
-    - Parameter **values**: the list of numerical values on which we want to conduct the normal test
-    - **Precondition**: values is a list of numerical data
-
-    """
-    stat, p2 = stats.normaltest(values)
-    alpha = 1e-3
-    # print("p = {}".format(p2))
-    if p2 < alpha:
-        # the values were not drawn from a normal distribuition
-        # print("the null hp can be rejected")
-        return 1
-    else:
-        # the values were drawn from a normal distribuiton
-        # print("the null hp cannot be rejected")
-        return 0
-def normalizeData(data):
-    return np.log(data)
-def pvalueTest(vec1,vec2,alphaValue):
-    res = stats.ttest_ind(vec1,vec2).pvalue
-    if res <= alphaValue:
-        return True,res
-    else:
-        return False,res
-
+import pandas as pd
+from utils import *
 
 # Carico il csv contenente le distanze di una sequenza video da analizzare
 videoSequence = pd.read_csv("Local_Distances/S506_001_LD_euclidean.csv", header=None)
@@ -78,7 +22,7 @@ splits = list(range(2,len(videoSequence)-1))
 # Visualizzazione dell'istogramma delle distanze di un solo landmark prima e dopo la normalizzazione
 # data = videoSequence.iloc[1:, :1]
 # histogramPlotter(data)
-# normlized = normalizeData(data)
+# normalized = normalizeData(data)
 # histogramPlotter(normalized)
 
 

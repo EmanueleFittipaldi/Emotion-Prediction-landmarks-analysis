@@ -1,6 +1,108 @@
 import os
+from scipy import stats
+import numpy as np
+from matplotlib import pyplot as plt
 from scipy import spatial
+
+
+def pvaluePlotter(Pvalue_history, splits):
+    """
+    This Function takes a list of pvalues and a list of splits where these pvalues where calculated and
+    creates a plot showing how pvalue changed according to the several splits.
+        - **Returns**: nothing
+
+        - Parameter **Pvalue_history**: a list of pvalues
+
+        - Parameter **splits**: a list of the split points where the pvalues where valuated
+
+        - **Precondition**: Pvalue_history and splits are lists of numbers
+    """
+    x = np.array(splits)
+    y = np.array(Pvalue_history)
+    plt.ylabel("pvalue")
+    plt.plot(x, y, color="red", marker="o", label="pvalue")
+    plt.legend()
+    plt.show()
+
+
+def histogramPlotter(data):
+    """
+     This Function takes a list of values and uses plt.hist() to plot them
+         - **Returns**: nothing
+
+         - Parameter **data**: a list of pvalues
+
+
+         - **Precondition**: list of values
+     """
+    plt.hist(data)
+    plt.show()
+
+
+def normalTest(values):
+    """
+    This function takes a list of numerical values and conduct a normal test over these values returning a p2 value.
+    If this value is less than alpha, we conclude that the values were not drawn from a normal distribuition.
+
+    - **Returns**: 1 if we can reject the null hypotesis, meaning that the values were not drawn from a normal distribuition,otherwise we return 0, meaning that the values were drawn from a normal distribuition.
+    - **Value return** has type int.
+    - Parameter **values**: the list of numerical values on which we want to conduct the normal test
+    - **Precondition**: values is a list of numerical data
+
+    """
+    stat, p2 = stats.normaltest(values)
+    alpha = 1e-3
+    # print("p = {}".format(p2))
+    if p2 < alpha:
+        # the values were not drawn from a normal distribuition
+        # print("the null hp can be rejected")
+        return 1
+    else:
+        # the values were drawn from a normal distribuiton
+        # print("the null hp cannot be rejected")
+        return 0
+
+
+def normalizeData(data):
+    """
+     This Function takes a list of values and uses np.log() function to normalize them. After the application of this
+     function, all the data should now follow a normal distribuition.
+         - **Returns**: list of normalized values
+
+         - Parameter **data**: a list of numerical data
+
+
+         - **Precondition**: Data must be a list of values
+     """
+    return np.log(data)
+
+
+def pvalueTest(vec1, vec2, alphaValue):
+    """
+     This Function takes two lists of numerical values representing two hypotetically distinguished distribuitions of values,
+     and an alpha value. Through pvalue we compare these two distribuitions, returning if they are statistically different.
+         - **Returns**: True or False as a result of the statistical significance test and the pvalue
+         - **Value return** has type boolean and float.
+         - Parameter **vec1,vec2**: lists of numerical values
+         - Parameter **alphaValue**: threshold by which we can conclude an example is significant or not
+         - **Precondition**: vec1,vec2 lists of numerical values. alphavalue a single float number
+     """
+    res = stats.ttest_ind(vec1, vec2).pvalue
+    if res <= alphaValue:
+        return True, res
+    else:
+        return False, res
+
+
 def getDirectories(path_dataset):
+    """
+     This Function takes as input the path of the Dataset and returns a list containing all the paths for the directories
+     of each videosequence.
+         - **Returns**: List of the videosequence directories paths.
+         - **Value return**: List of strings.
+         - Parameter **path_dataset**: path of the dataset, type string.
+         - **Precondition**: Dataset must exists at path indicated. path_dataset type string
+     """
     # struttura dati che contiene i path delle singole directory di ogni singolo soggetto
     Dataset_folders = []
     for root, subdirs, files in os.walk(path_dataset):
@@ -16,14 +118,14 @@ def getDirectories(path_dataset):
                         Dataset_folders.append(os.path.join(path_sdir, dir))
     return Dataset_folders
 
-# Per verificare se due sequenze di numeri sono simili utilizziamo il concetto di similarità del coseno
-def vectorSimilarity(v1,v2):
+
+def vectorSimilarity(v1, v2):
+    """
+      This Function takes as input two lists of numerical values and return in % how similiar they are using the spatial distance
+      cosine.
+          - **Returns**: float indicating the percentage of how similiare these two lists of values are.
+          - **Value return**: % as a float number.
+          - Parameter **v1,v2**: lists of numerical values.
+          - **Precondition**:v1,v2 must be numerical values
+      """
     return 1 - spatial.distance.cosine(v1, v2)
-
-
-# vec1 = [114, 122, 128, 133, 157, 158, 159, 168, 173, 188, 189, 190, 193,243, 244, 245,28,364, 365, 367, 379, 394, 397, 430, 434, 56, 8,0,0,0,0]
-# vec2 = [100, 101, 118, 119, 120, 123, 18, 251, 264, 265, 276, 283, 293, 300, 301, 313,340,345, 346, 347,353,356, 368, 372, 383, 389, 446, 447, 47, 50, 83]
-# vec3 = [100, 105, 107, 114, 126, 128, 133, 142, 189, 190, 193, 205, 209, 217, 221, 222, 223, 224, 233, 243, 244, 27, 28, 280, 29, 352, 355, 371, 376, 47, 50]
-# vec1= sorted(vec1)
-# vec2 = sorted(vec2)
-# print(vectorSimilarity(vec2,vec3))
