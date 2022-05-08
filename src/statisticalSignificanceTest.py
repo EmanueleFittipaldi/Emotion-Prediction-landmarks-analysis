@@ -1,9 +1,11 @@
 from statistics import mode
 import pandas as pd
 from utils import *
+from mpl_toolkits.mplot3d import axes3d
+import matplotlib.pyplot as plt
 
 # Carico il csv contenente le distanze di una sequenza video da analizzare
-videoSequence = pd.read_csv("Local_Distances/S506_001_LD_euclidean.csv", header=None)
+videoSequence = pd.read_csv("Local_Distances/S999_003_LD_euclidean.csv", header=None)
 
 # Pvalue_history: lista dei valori che il pvalue ha assunto per ciascun landmark e per ciascun split
 # splitsChangeOccurred: lista dei frame in cui è avvenuta una variazione significativa di un landmark
@@ -66,3 +68,31 @@ print("These are the key splits where major significance was detected")
 splitsChangeOccurred =sorted(list(set(splitsChangeOccurred)))
 print(splitsChangeOccurred)
 
+
+
+
+first_frame = pd.read_csv('frames_csv/S999_003_00000001.csv')
+frame = pd.read_csv('frames_csv/S999_003_00000002.csv')
+# last_frame = pd.read_csv('frames_csv/S005_001_00000011.csv')
+print(first_frame)
+print(frame)
+
+fig = plt.figure(figsize=(12, 12))
+ax = fig.add_subplot(projection='3d')
+
+sequence_containing_x_vals = first_frame['x']
+sequence_containing_y_vals = first_frame['y']
+sequence_containing_z_vals = first_frame['z']
+sequence_frame_ind_x = []
+sequence_frame_ind_y = []
+sequence_frame_ind_z = []
+
+for val in landmarksInvolved:
+    sequence_frame_ind_x.append(frame.iloc[val:val+1, :1])
+    sequence_frame_ind_y.append(frame.iloc[val:val + 1, 1:2])
+    sequence_frame_ind_z.append(frame.iloc[val:val + 1, 2:3])
+
+ax.scatter3D(sequence_containing_x_vals, sequence_containing_y_vals, sequence_containing_z_vals, color='blue')
+ax.scatter3D(sequence_frame_ind_x, sequence_frame_ind_y, sequence_frame_ind_z, color='red')
+
+plt.show()
