@@ -31,13 +31,13 @@ splits = list(range(2,len(videoSequence)-1))
 # Per ogni landmark, prendo tutti i valori della colonna, li normalizzo, li porto in valore assoluto e li
 # memorizzo nella stessa colonna. Conduco poi il test di normalità per vedere se adesso tutte le misure per quel
 # landmark segue una distribuzione normale. Se non la segue allora lo inserisco nella lista degli "outlier"
-
-for i in range(0,len(videoSequence.columns)-2):
-    data = videoSequence.iloc[1:, i:i+1]
-    videoSequence.iloc[1:, i:i+1] = abs(np.log(data))
-    if normalTest(videoSequence.iloc[1:, i:i+1]):
-        outlier.append(i)
-print("Numero di landmark non normalizzati: {}, landmark: {}".format(len(outlier), outlier))
+#
+# for i in range(0,len(videoSequence.columns)-2):
+#     data = videoSequence.iloc[1:, i:i+1]
+#     videoSequence.iloc[1:, i:i+1] = abs(np.log(data))
+#     if normalTest(videoSequence.iloc[1:, i:i+1]):
+#         outlier.append(i)
+# print("Numero di landmark non normalizzati: {}, landmark: {}".format(len(outlier), outlier))
 
 alpha = 0.01
 for split in splits:
@@ -67,32 +67,3 @@ print(len(landmarksInvolved))
 print("These are the key splits where major significance was detected")
 splitsChangeOccurred =sorted(list(set(splitsChangeOccurred)))
 print(splitsChangeOccurred)
-
-
-
-
-first_frame = pd.read_csv('frames_csv/S999_003_00000001.csv')
-frame = pd.read_csv('frames_csv/S999_003_00000002.csv')
-# last_frame = pd.read_csv('frames_csv/S005_001_00000011.csv')
-print(first_frame)
-print(frame)
-
-fig = plt.figure(figsize=(12, 12))
-ax = fig.add_subplot(projection='3d')
-
-sequence_containing_x_vals = first_frame['x']
-sequence_containing_y_vals = first_frame['y']
-sequence_containing_z_vals = first_frame['z']
-sequence_frame_ind_x = []
-sequence_frame_ind_y = []
-sequence_frame_ind_z = []
-
-for val in landmarksInvolved:
-    sequence_frame_ind_x.append(frame.iloc[val:val+1, :1])
-    sequence_frame_ind_y.append(frame.iloc[val:val + 1, 1:2])
-    sequence_frame_ind_z.append(frame.iloc[val:val + 1, 2:3])
-
-ax.scatter3D(sequence_containing_x_vals, sequence_containing_y_vals, sequence_containing_z_vals, color='blue')
-ax.scatter3D(sequence_frame_ind_x, sequence_frame_ind_y, sequence_frame_ind_z, color='red')
-
-plt.show()
