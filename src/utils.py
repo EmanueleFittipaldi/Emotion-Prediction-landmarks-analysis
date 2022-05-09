@@ -3,7 +3,7 @@ from scipy import stats
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import spatial
-
+import statistics
 
 def pvaluePlotter(Pvalue_history, splits):
     """
@@ -128,4 +128,13 @@ def vectorSimilarity(v1, v2):
           - Parameter **v1,v2**: lists of numerical values.
           - **Precondition**:v1,v2 must be numerical values
       """
+    if len(v1) > len(v2):
+        delta = len(v1) - len(v2)
+        for i in range(delta):
+            v2.append(statistics.mean(v2))
+    elif len(v1) < len(v2):
+        delta = len(v2) - len(v1)
+        for i in range(delta):
+            v1.append(statistics.mean(v1))
+
     return 1 - spatial.distance.cosine(v1, v2)
