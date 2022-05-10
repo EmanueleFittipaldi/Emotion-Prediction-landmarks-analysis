@@ -149,8 +149,9 @@ def get_similarities(emotion1, emotion2):
 
     return statistics.mean(all_similarities)
 
-print("Emozione: Felicità")
-print("Media di similarità nell'emozione Felicità: {}".format(get_similarities(5.0, 5.0)))
+for i in range(7):
+    print("Emozione: ", i+1)
+    print("Media di similarità nell'emozione {}: {}".format(i+1, get_similarities(i+1, i+1)))
 
 print("Emozione: rapporto Felicità / Paura")
 print("Media di similarità nell'emozione Felicità: {}".format(get_similarities(5.0, 4.0)))
