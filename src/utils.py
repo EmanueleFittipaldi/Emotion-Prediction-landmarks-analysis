@@ -1,10 +1,12 @@
 import os
+
+import pandas as pd
 from scipy import stats
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import spatial
 import statistics
-
+import csv
 def pvaluePlotter(Pvalue_history, splits):
     """
     This Function takes a list of pvalues and a list of splits where these pvalues where calculated and
@@ -119,6 +121,38 @@ def getDirectories(path_dataset):
     return Dataset_folders
 
 
+# funzione per andare a calcolare le direzioni dei landmark su asse x e y
+def landmarks_XYdirections(subject, indexF):
+    path_dir = "frames_csv"
+    frames = []
+    for file in sorted(os.listdir(path_dir)):
+        if file.startswith(subject):
+            frames.append(os.path.join(path_dir, file))
+
+    landmarks_directions = {}
+    firstFrame = pd.read_csv(frames[0])
+    lastFrame = pd.read_csv(frames[indexF])
+
+    for i in range(468):
+        directions = []
+        coordXFirst = firstFrame['x'][i]
+        coordXLast = lastFrame['x'][i]
+        coordYFirst = firstFrame['y'][i]
+        coordYLast = lastFrame['y'][i]
+
+        if (coordXLast - coordXFirst) > 0:
+            directions.append(+1)
+        else:
+            directions.append(-1)
+        if (coordYLast - coordYFirst) > 0:
+            directions.append(+1)
+        else:
+            directions.append(-1)
+
+        landmarks_directions[i] = directions
+
+    return landmarks_directions
+
 def vectorSimilarity(v1, v2):
     """
       This Function takes as input two lists of numerical values and return in % how similiar they are using the spatial distance
@@ -131,12 +165,12 @@ def vectorSimilarity(v1, v2):
     if len(v1) > len(v2):
         delta = len(v1) - len(v2)
         for i in range(delta):
-             v2.append(statistics.mean(v2))
-            # v2.append(0)
+              # v2.append(statistics.mean(v2))
+             v2.append(0)
     elif len(v1) < len(v2):
         delta = len(v2) - len(v1)
         for i in range(delta):
-            v1.append(statistics.mean(v1))
-            # v1.append(0)
+            # v1.append(statistics.mean(v1))
+             v1.append(0)
 
     return 1 - spatial.distance.cosine(v1, v2)
