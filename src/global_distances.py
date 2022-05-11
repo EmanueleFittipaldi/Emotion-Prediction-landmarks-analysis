@@ -69,7 +69,7 @@ def distance_calc(path_globaldcsv, namePath, nameDist):
          print("Nome distanza da calcolare errata!")
 
 # calcolo della distanza euclidea
-distance_calc("GD_euclidean_csv", "GD_euclidean.csv", "EUCLIDEAN")
+# distance_calc("GD_euclidean_csv", "GD_euclidean.csv", "EUCLIDEAN")
 
 # calcolo della distanza di manhattan
-distance_calc("GD_manhattan_csv", "GD_manhattan.csv", "MANHATTAN")
+# distance_calc("GD_manhattan_csv", "GD_manhattan.csv", "MANHATTAN")
