@@ -2,8 +2,9 @@ import os
 import csv
 import cv2
 import mediap_util as mpu
+import pandas as pd
 
-def process_landmarks(dir,img):
+def extract_landmarks(dir,img):
     filename = 'frames_csv/'+str(img)
     filename = filename.replace('.png', '.csv')
 
@@ -27,3 +28,6 @@ def process_landmarks(dir,img):
     writer.writerows(data)
 
     f.close()
+
+
+
