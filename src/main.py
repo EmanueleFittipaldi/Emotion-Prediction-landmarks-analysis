@@ -9,63 +9,69 @@ import pandas as pd
 path_dataset = hp.getFromEnv('DatasetPath')
 # path label
 path_label = hp.getFromEnv('LabelPath')
+Dataset_folders = utils.getDirectories(path_dataset)
+Emotion_folders = utils.getDirectories(path_label)
 
-def processLandmarks(Dataset_folders):
+# estrazione landmarks dalle immagini
+def process_landmarks(Dataset_folders):
     # loop nelle diverse cartelle per andare ad ottenere le singole immagini dei soggetti ed estrarre i landmark
     for dir in sorted(Dataset_folders):
         for img in os.listdir(dir):
-            lext.process_landmarks(dir,img)
+            lext.extract_landmarks(dir,img)
 
-Dataset_folders = utils.getDirectories(path_dataset)
-# processLandmarks(Dataset_folders)
-Emotion_folders = utils.getDirectories(path_label)
-# print(Emotion_folders)
+# aggiunta delle etichette emozioni mancanti
+def missing_EmotionLabels():
+    # ottenimento delle cartelle in cui non sono presenti le etichette dell'emozioni
+    missing_EMlabels = []
+    for dir in sorted(Emotion_folders):
+        if len(os.listdir(dir)) == 0:
+            missing_EMlabels.append(dir)
+    if len(missing_EMlabels) == 0:
+        print("Tutte le label per le emozioni sono state aggiunte")
+    else:
+        f = plt.figure()
+        valueString = ".0000000e+00"
+        for dir in Dataset_folders:
+            for missing in missing_EMlabels:
+                if dir.find(missing[16:]) != -1:
+                    all_imges = sorted(os.listdir(dir))
+                    image = cv2.imread(os.path.join(dir,all_imges[len(os.listdir(dir))-1]))
+                    plt.imshow(image)
+                    plt.show()
+                    while(True):
+                        val = input("Enter value of emotion: ")
+                        if val != "":
+                            filename = os.path.join(missing, all_imges[len(os.listdir(dir)) - 1].replace(".png","_emotion.txt"))
+                            f = open(filename, 'w')
+                            f.write(val + valueString)
+                            f.close()
+                            break
 
-# ottenimento delle cartelle in cui non sono presenti le etichette dell'emozioni
-missing_EMlabels = []
-for dir in sorted(Emotion_folders):
-    if len(os.listdir(dir)) == 0:
-        missing_EMlabels.append(dir)
-
-f = plt.figure()
-valueString = ".0000000e+00"
-for dir in Dataset_folders:
-    for missing in missing_EMlabels:
-        if dir.find(missing[16:]) != -1:
-            all_imges = sorted(os.listdir(dir))
-            image = cv2.imread(os.path.join(dir,all_imges[len(os.listdir(dir))-1]))
-            plt.imshow(image)
-            plt.show()
-            while(True):
-                val = input("Enter value of emotion: ")
-                if val != "":
-                    filename = os.path.join(missing, all_imges[len(os.listdir(dir)) - 1].replace(".png","_emotion.txt"))
+# aggiunta delle etichette sui sessi
+def missing_GenderLabels():
+    for dir in sorted(Dataset_folders):
+        all_imges = sorted(os.listdir(dir))
+        if all_imges[0].startswith("."):
+            path_image = os.path.join(dir, all_imges[1])
+        else:
+            path_image = os.path.join(dir, all_imges[0])
+        print(path_image)
+        filename = os.path.join(dir, all_imges[len(os.listdir(dir)) - 1]) \
+            .replace("cohn-kanade-images", "Emotion") \
+            .replace(".png", "_gender.txt")
+        if not os.path.exists(filename):
+            while (True):
+                # Uomo = 0
+                # Donna = 1
+                val = input("Enter value of gender: ")
+                if val != "" or val != 0 or val != 1:
                     f = open(filename, 'w')
-                    f.write(val + valueString)
+                    f.write(val)
                     f.close()
                     break
 
-for dir in sorted(Dataset_folders):
-    all_imges = sorted(os.listdir(dir))
-    if all_imges[0].startswith("."): path_image = os.path.join(dir, all_imges[1])
-    else: path_image = os.path.join(dir, all_imges[0])
-    print(path_image)
-    filename = os.path.join(dir, all_imges[len(os.listdir(dir)) - 1]) \
-        .replace("cohn-kanade-images", "Emotion") \
-        .replace(".png", "_gender.txt")
-    if not os.path.exists(filename):
-        while (True):
-            # Uomo = 0
-            # Donna = 1
-            val = input("Enter value of gender: ")
-            if val != "" or val != 0 or val != 1:
-                f = open(filename, 'w')
-                f.write(val)
-                f.close()
-                break
-
-
-def insert_labels(path_label,path_GDcsv):
+# aggiunta etichette di emozione e sesso ai csv delle distanze
+def insert_labels_to_csv(path_label, path_GDcsv):
     dataset_labels = utils.getDirectories(path_label)
     for dir in sorted(dataset_labels):
         for file in sorted(os.listdir(dir)):
@@ -81,5 +87,11 @@ def insert_labels(path_label,path_GDcsv):
                     df[len(df.columns)] = string_formatted
                     df.to_csv(os.path.join(path_GDcsv,csv), index=False,header=None)
 
-# insert_labels("Dataset/Emotion", "Global_Distances")
-# insert_labels("Dataset/Emotion", "Local_Distances")
+# process_landmarks(Dataset_folders)
+missing_EmotionLabels()
+# missing_GenderLabels()
+# insert_labels_to_csv("Dataset/Emotion", "Global_Distances")
+# insert_labels_to_csv("Dataset/Emotion", "Local_Distances")
+
+
+
