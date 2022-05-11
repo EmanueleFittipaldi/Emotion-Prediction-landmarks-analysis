@@ -1,6 +1,5 @@
 import os
 import statistics
-import random
 
 import pandas as pd
 from utils import *
@@ -131,42 +130,41 @@ def get_similarities(emotion1, emotion2):
     for s in emotion1_subjects:
         videoSequence_global = pd.read_csv("Global_Distances/" + s, header=None)
         significativeLandmarks = process_threshold_landmarks(videoSequence_global)
-        emotion1_significant_landmarks[s[:8]] = significativeLandmarks
+        directions = landmarks_XYdirections(s[:8], len(videoSequence_global.axes[0]) - 1)
+        for i in significativeLandmarks:
+            data = [i, directions[i][0], directions[i][1]]
+            if s[:8] in emotion1_significant_landmarks:
+                emotion1_significant_landmarks[s[:8]].append(data)
+            else:
+                emotion1_significant_landmarks[s[:8]] = [data]
     if emotion1 == emotion2:
         emotion2_significant_landmarks = emotion1_significant_landmarks
     else:
         for s in emotion2_subjects:
             videoSequence_global = pd.read_csv("Global_Distances/" + s, header=None)
             significativeLandmarks = process_threshold_landmarks(videoSequence_global)
-            emotion2_significant_landmarks[s[:8]] = significativeLandmarks
+            directions = landmarks_XYdirections(s[:8], len(videoSequence_global.axes[0])-1)
+            for i in significativeLandmarks:
+                data = [i, directions[i][0], directions[i][1]]
+                if s[:8] in emotion2_significant_landmarks:
+                    emotion2_significant_landmarks[s[:8]].append(data)
+                else:
+                    emotion2_significant_landmarks[s[:8]] = [data]
 
     all_similarities = []
     for key1 in emotion1_significant_landmarks:
         for key2 in emotion2_significant_landmarks:
             if key1 == key2: continue
-            sim = vectorSimilarity(emotion1_significant_landmarks[key1], emotion2_significant_landmarks[key2])
+            flat_emotion1 = [item for sublist in emotion1_significant_landmarks[key1] for item in sublist]
+            flat_emotion2 = [item for sublist in emotion2_significant_landmarks[key2] for item in sublist]
+            sim = vectorSimilarity(flat_emotion1, flat_emotion2)
             all_similarities.append(sim)
 
     return statistics.mean(all_similarities)
 
+Emotions = { 1:"Anger", 2:"contempt", 3:"disgust", 4:"fear", 5:"happy", 6:"sadness", 7:"surprise"}
 for i in range(7):
-    print("Emozione: ", i+1)
-    print("Media di similarità nell'emozione {}: {}".format(i+1, get_similarities(i+1, i+1)))
-
-print("Emozione: rapporto Felicità / Paura")
-print("Media di similarità nell'emozione Felicità: {}".format(get_similarities(5.0, 4.0)))
-
-print("Emozione: rapporto Felicità / Tristezza")
-print("Media di similarità nell'emozione Felicità: {}".format(get_similarities(5.0, 6.0)))
-
-print("Emozione: rapporto Felicità / Disgusto")
-print("Media di similarità nell'emozione Felicità: {}".format(get_similarities(5.0, 3.0)))
-
-print("Emozione: rapporto Felicità / Rabbia")
-print("Media di similarità nell'emozione Felicità: {}".format(get_similarities(5.0, 1.0)))
-
-print("Emozione: rapporto Felicità / Disprezzo")
-print("Media di similarità nell'emozione Felicità: {}".format(get_similarities(5.0, 2.0)))
-
-print("Emozione: rapporto Felicità / Sorpresa")
-print("Media di similarità nell'emozione Felicità: {}".format(get_similarities(5.0, 7.0)))
+    print("\n")
+    for j in range(7):
+        print("Emozione_1: {}, Emozione_2: {}".format(Emotions[i+1], Emotions[j+1]))
+        print("Rapport di similarità tra {} e {}: {}".format(Emotions[i+1], Emotions[j+1], get_similarities(i+1, j+1)))
