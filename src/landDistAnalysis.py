@@ -1,67 +1,23 @@
-import os
-import statistics
-
-import pandas as pd
 from utils import *
+import plot_utils as plot
 
-# plotting 3D del primo frame (volto in posizione neutrale) e del frame che è stato individuato dal pvalue come significativo
-# oppure dell'ultimo frame in cui si ha la massima macro-espressione
-# first_frame = pd.read_csv('frames_csv/S999_003_00000001.csv')
-# frame = pd.read_csv('frames_csv/S999_003_00000002.csv')
-# # last_frame = pd.read_csv('frames_csv/S005_001_00000011.csv')
-# print(first_frame)
-# print(frame)
-#
-# fig = plt.figure(figsize=(12, 12))
-# ax = fig.add_subplot(projection='3d')
-#
-# sequence_containing_x_vals = first_frame['x']
-# sequence_containing_y_vals = first_frame['y']
-# sequence_containing_z_vals = first_frame['z']
-# sequence_frame_ind_x = []
-# sequence_frame_ind_y = []
-# sequence_frame_ind_z = []
-#
-# for val in landmarksInvolved:
-#     sequence_frame_ind_x.append(frame.iloc[val:val+1, :1])
-#     sequence_frame_ind_y.append(frame.iloc[val:val + 1, 1:2])
-#     sequence_frame_ind_z.append(frame.iloc[val:val + 1, 2:3])
-#
-# ax.scatter3D(sequence_containing_x_vals, sequence_containing_y_vals, sequence_containing_z_vals, color='blue')
-# ax.scatter3D(sequence_frame_ind_x, sequence_frame_ind_y, sequence_frame_ind_z, color='red')
-#
-# plt.show()
-def calculate_threshold(frame1, frame2):
-    # CALCOLO threshold su landmark significativi per un solo soggetto e sola emozione
-    # abbiamo preso la distanza (tra il secondo frame ed il primo) e la distanza (tra il frame individuato ed il primo), vedendo che dai landmark 200 ci sono delle distanze significative, quindi abbiamo calcolato
-    # il delta (la differenza tra le distanze) andando a calcolare la media e stabilira una soglia.
-    # # successivamente abbiamo visto quali landmark (prendendo la distanza dei frame considerati) superano la soglia e li abbiamo mostrati sul grafico
-    # il concetto si basa sul considerare le distanze, tra:
-    # - secondo frame e il primo (da posizione neutrale ad inizio micro-espressione)
-    # - frame individuato (visivamente o applicando qualche concetto statistico, da valutare), in cui si ha un cambiamento di espressione significativo, e il primo
-    # visualizziamo sul grafico quali landmark sono significativi, quindi quelli che hanno subito una maggiore variazione
-    # andiamo a considerare l'intervallo di questi landmark e calcoliamo il delta, ovvero la differenza tra distanze
-    # calcoliamo la media di questi valori (delta) e la consideriamo come soglia che i landmark devono superare per essere considerati significativi
-    delta_distances = []
-    for i in range(0, 468):
-        delta = frame2[i] - frame1[i]
-        delta_distances.append(delta)
-
-    return statistics.mean(delta_distances)
-
-def plot_action_detected(videoSequence, indexFrame):
-    # creazione grafico in cui mostriamo i landmark del primo frame (in blu e rappresentati da dei cerchi) e quelli del frame individuato
-    # in cui si ha una variazione significativa da micro a macro espressione (in rosso e rappresentati dai triangoli)
-    for i in range(len(videoSequence.columns) - 2):
-        plt.plot(i, videoSequence.iloc[1, i], color='blue', marker='o')  # primo frame
-        plt.plot(i, videoSequence.iloc[indexFrame, i], color='red', marker='^')  # frame di interesse
-
-    plt.xlabel('Landmarks', fontsize=14)
-    plt.ylabel('Global Distances', fontsize=14)
-    plt.grid(True)
-    plt.show()
+Emotions = { 1 : "Anger",
+             2 : "Contempt",
+             3 : "Disgust",
+             4 : "Fear",
+             5 : "Happy",
+             6 : "Sadness",
+             7 : "Surprise"
+             }
 
 def get_distances_overT(frame, threshold):
+    """
+        ****
+       - **Returns**:
+       - **Value return** has type
+       - Parameter **values**:
+       - **Precondition**:
+       """
     distances_overT = []
     landmarks = []
     for i in range(0,468):
@@ -70,47 +26,115 @@ def get_distances_overT(frame, threshold):
             landmarks.append(i)
     return distances_overT, landmarks
 
-def plot_landmark(subject, videoSequence, frame1, frame2, threshold):
-    # creazione grafico in cui mostriamo i landmark del primo frame (in blu e rappresentati da dei cerchi) e solo i landmark significativi, del frame individuato
-    # in cui si ha una variazione significativa da micro a macro espressione (in rosso e rappresentati dai triangoli)
-    # struttura dati con le distanze che superano la soglia
-    distances_overT, xAxis_distances = get_distances_overT(frame1, frame2, threshold)
+def process_threshold_landmarks(subject, emotion, frameSeq):
+    """
+                   funzione che calcola la threshold e ottiene i landmark che superano la threshold
 
-    for i in range(len(videoSequence.columns)-2):
-        plt.plot(i,videoSequence.iloc[1,i], color='blue', marker='o') # primo frame
-        if i in xAxis_distances:
-            plt.plot(i, distances_overT[xAxis_distances.index(i)], color='red', marker='^') # landmark che hanno superato la soglia
-    plt.title(subject)
-    plt.xlabel('Landmarks', fontsize=14)
-    plt.ylabel('Global Distances', fontsize=14)
-    plt.grid(True)
-    plt.show()
+                  - **Returns**:
+                  - **Value return** has type
+                  - Parameter **values**:
+                  - **Precondition**:
+       """
+    number_rows = len(frameSeq.axes[0])
 
-def process_threshold_landmarks(videoSequence_global):
-    distances_FirstFrame = videoSequence_global.iloc[1:2, :468].values.tolist()
-    flat_distances_first = [item for sublist in distances_FirstFrame for item in sublist]
+    dist_ff = frameSeq.iloc[1:2, :468].values.tolist()
+    fldist_ff = [item for sublist in dist_ff for item in sublist]
 
-    # numero di righe che indica il numero di frame
-    number_rows = len(videoSequence_global.axes[0])
+    dist_lf = frameSeq.iloc[number_rows-1:number_rows, :468].values.tolist()
+    fldist_lf = [item for sublist in dist_lf for item in sublist]
 
-    distances_LastFrame = videoSequence_global.iloc[number_rows-1:number_rows, :468].values.tolist()
-    flat_distances_last = [item for sublist in distances_LastFrame for item in sublist]
-    # maxDistance =  max(flat_distances)
-    # threshold = maxDistance - ((maxDistance * 5) /100) # prendiamo il 20% dei landmark più alti
+    delta_distances = []
+    for i in range(0, 468):
+        delta = fldist_lf[i] - fldist_ff[i]
+        delta_distances.append(delta)
 
-    threshold = calculate_threshold(flat_distances_first, flat_distances_last)
+    threshold = statistics.mean(delta_distances)
 
-    # plot_landmark(subject, videoSequence_global, flat_list_frame1, frame2, threshold)
-    distances_overT, significative_Landmarks = get_distances_overT(flat_distances_last,threshold)
-    return significative_Landmarks
+    distancesOverT, significativeLandmarks = get_distances_overT(fldist_lf, threshold)
+    # plot.plot_significative_landmarks('Global Distances', subject, frameSeq, distancesOverT, significativeLandmarks)
+    plot.plot_scatter3D(subject[:8], emotion, significativeLandmarks)
 
-Dataset_Emotion = getDirectories("Dataset/Emotion")
+    return significativeLandmarks
+
+def get_landmarks(distance_dir, emotion, emotion_subject):
+    """
+                funzione che estrae per ogni soggetto di ogni emozione, i landmark e le direzioni dei landmark
+
+               - **Returns**:
+               - **Value return** has type
+               - Parameter **values**:
+               - **Precondition**:
+    """
+
+    emotion_dict = {}
+
+    for s in emotion_subject:
+        frameSequence = pd.read_csv(distance_dir + s, header=None)
+        signLandmarks = process_threshold_landmarks(s, emotion, frameSequence)
+        directions = landmarks_XYdirections(s[:8], len(frameSequence.axes[0]) - 1)
+
+        for i in signLandmarks:
+            data = [i, directions[i][0], directions[i][1]]
+            if s[:8] in emotion_dict:
+                emotion_dict[s[:8]].append(data)
+            else:
+                emotion_dict[s[:8]] = [data]
+
+    return emotion_dict
+
+def get_emotion_similarities(emotion1, emotion2, distance_dir):
+    """
+            funzione che estrae per ogni soggetto di ogni emozione, i landmark significativi
+            confronta i vettori di landmark (in cui sono incluse anche le direzioni) dando in output una percentuale di similarità
+
+           - **Returns**:
+           - **Value return** has type
+           - Parameter **values**:
+           - **Precondition**:
+           """
+    # ottengo tutti i soggetti dell'emozione 1
+    em1_subjects = emotion_dictionary[emotion1]
+
+    # ottengo tutti i soggetti dell'emozione 2
+    em2_subjects = emotion_dictionary[emotion2]
+
+    # dizionario che contiene i landmark (con le direzioni) per ogni soggetti della emozione 1
+    em1_sign_land = get_landmarks(distance_dir, Emotions[emotion1], em1_subjects)
+
+    if emotion1 == emotion2:
+        # dizionario che contiene i landmark (con le direzioni) per ogni soggetti della emozione 2
+        em2_sign_land = em1_sign_land
+    else:
+        # dizionario che contiene i landmark (con le direzioni) per ogni soggetti della emozione 2
+        em2_sign_land = get_landmarks(distance_dir, Emotions[emotion2], em2_subjects)
+
+    all_similarities = []
+    for key1 in em1_sign_land:
+        for key2 in em2_sign_land:
+            if key1 == key2: continue
+            flat_em1 = [item for sublist in em1_sign_land[key1] for item in sublist]
+            flat_em2 = [item for sublist in em1_sign_land[key2] for item in sublist]
+            sim = vectorSimilarity(flat_em1, flat_em2)
+            all_similarities.append(sim)
+
+    return statistics.mean(all_similarities)
+
+
+# Ottenimento delle cartelle che contengono le label delle emozioni di ogni soggetto
+path_emotion = "Dataset/Emotion"
+Dataset_Emotion = getDirectories(path_emotion)
+distance_name = "_GD_euclidean"
+distance_typedir = "Global_Distances/"
+
+
+# dizionario che mantiene le emozioni con i diversi soggetti,
+# quindi le chiavi sono le emozioni ed i valori tutti i soggetti di quella emozione
 emotion_dictionary = {}
 for dir in Dataset_Emotion:
     for file in os.listdir(dir):
         if os.path.basename(file).find('emotion') != -1:
-            subject = file[:8]+"_GD_euclidean.csv"
-            filename = os.path.join(dir,file)
+            subject = file[:8]+distance_name+".csv"
+            filename = os.path.join(dir, file)
             f = open(filename, "r")
             string_formatted = float(f.read().strip())
             f.close()
@@ -121,50 +145,9 @@ for dir in Dataset_Emotion:
 
 # print(emotion_dictionary)
 
-def get_similarities(emotion1, emotion2):
-    emotion1_subjects = emotion_dictionary[emotion1]
-    emotion1_significant_landmarks = {}
-    emotion2_subjects = emotion_dictionary[emotion2]
-    emotion2_significant_landmarks = {}
-
-    for s in emotion1_subjects:
-        videoSequence_global = pd.read_csv("Global_Distances/" + s, header=None)
-        significativeLandmarks = process_threshold_landmarks(videoSequence_global)
-        directions = landmarks_XYdirections(s[:8], len(videoSequence_global.axes[0]) - 1)
-        for i in significativeLandmarks:
-            data = [i, directions[i][0], directions[i][1]]
-            if s[:8] in emotion1_significant_landmarks:
-                emotion1_significant_landmarks[s[:8]].append(data)
-            else:
-                emotion1_significant_landmarks[s[:8]] = [data]
-    if emotion1 == emotion2:
-        emotion2_significant_landmarks = emotion1_significant_landmarks
-    else:
-        for s in emotion2_subjects:
-            videoSequence_global = pd.read_csv("Global_Distances/" + s, header=None)
-            significativeLandmarks = process_threshold_landmarks(videoSequence_global)
-            directions = landmarks_XYdirections(s[:8], len(videoSequence_global.axes[0])-1)
-            for i in significativeLandmarks:
-                data = [i, directions[i][0], directions[i][1]]
-                if s[:8] in emotion2_significant_landmarks:
-                    emotion2_significant_landmarks[s[:8]].append(data)
-                else:
-                    emotion2_significant_landmarks[s[:8]] = [data]
-
-    all_similarities = []
-    for key1 in emotion1_significant_landmarks:
-        for key2 in emotion2_significant_landmarks:
-            if key1 == key2: continue
-            flat_emotion1 = [item for sublist in emotion1_significant_landmarks[key1] for item in sublist]
-            flat_emotion2 = [item for sublist in emotion2_significant_landmarks[key2] for item in sublist]
-            sim = vectorSimilarity(flat_emotion1, flat_emotion2)
-            all_similarities.append(sim)
-
-    return statistics.mean(all_similarities)
-
-Emotions = { 1:"Anger", 2:"contempt", 3:"disgust", 4:"fear", 5:"happy", 6:"sadness", 7:"surprise"}
+# confrontare le diverse emozioni di tutti i soggetti e visualizzare la similarità tra i landmark significativi estratti
 for i in range(7):
     print("\n")
     for j in range(7):
         print("Emozione_1: {}, Emozione_2: {}".format(Emotions[i+1], Emotions[j+1]))
-        print("Rapport di similarità tra {} e {}: {}".format(Emotions[i+1], Emotions[j+1], get_similarities(i+1, j+1)))
+        print("Rapport di similarità tra {} e {}: {}".format(Emotions[i+1], Emotions[j+1], get_emotion_similarities(i+1, j+1, distance_typedir)))
