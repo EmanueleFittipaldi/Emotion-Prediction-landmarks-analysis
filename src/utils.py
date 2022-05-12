@@ -7,38 +7,7 @@ from matplotlib import pyplot as plt
 from scipy import spatial
 import statistics
 import csv
-def pvaluePlotter(Pvalue_history, splits):
-    """
-    This Function takes a list of pvalues and a list of splits where these pvalues where calculated and
-    creates a plot showing how pvalue changed according to the several splits.
-        - **Returns**: nothing
 
-        - Parameter **Pvalue_history**: a list of pvalues
-
-        - Parameter **splits**: a list of the split points where the pvalues where valuated
-
-        - **Precondition**: Pvalue_history and splits are lists of numbers
-    """
-    x = np.array(splits)
-    y = np.array(Pvalue_history)
-    plt.ylabel("pvalue")
-    plt.plot(x, y, color="red", marker="o", label="pvalue")
-    plt.legend()
-    plt.show()
-
-
-def histogramPlotter(data):
-    """
-     This Function takes a list of values and uses plt.hist() to plot them
-         - **Returns**: nothing
-
-         - Parameter **data**: a list of pvalues
-
-
-         - **Precondition**: list of values
-     """
-    plt.hist(data)
-    plt.show()
 
 
 def normalTest(values):
