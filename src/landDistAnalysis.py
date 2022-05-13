@@ -1,5 +1,8 @@
+import statistics
+
 from utils import *
 import plot_utils as plot
+import json
 
 Emotions = { 1 : "Anger",
              2 : "Contempt",
@@ -52,7 +55,7 @@ def process_threshold_landmarks(subject, emotion, frameSeq):
 
     distancesOverT, significativeLandmarks = get_distances_overT(fldist_lf, threshold)
     # plot.plot_significative_landmarks('Global Distances', subject, frameSeq, distancesOverT, significativeLandmarks)
-    plot.plot_scatter3D(subject[:8], emotion, significativeLandmarks)
+    # plot.plot_scatter3D(subject[:8], emotion, significativeLandmarks)
 
     return significativeLandmarks
 
@@ -113,7 +116,7 @@ def get_emotion_similarities(emotion1, emotion2, distance_dir):
         for key2 in em2_sign_land:
             if key1 == key2: continue
             flat_em1 = [item for sublist in em1_sign_land[key1] for item in sublist]
-            flat_em2 = [item for sublist in em1_sign_land[key2] for item in sublist]
+            flat_em2 = [item for sublist in em2_sign_land[key2] for item in sublist]
             sim = vectorSimilarity(flat_em1, flat_em2)
             all_similarities.append(sim)
 
@@ -145,9 +148,12 @@ for dir in Dataset_Emotion:
 
 # print(emotion_dictionary)
 
+print("CONFRONTO TRA EMOZIONI CONSIDERANDO I LANDMARK SIGNIFICATIVI NELLE DISTANZE GLOBALI")
 # confrontare le diverse emozioni di tutti i soggetti e visualizzare la similarità tra i landmark significativi estratti
 for i in range(7):
     print("\n")
     for j in range(7):
         print("Emozione_1: {}, Emozione_2: {}".format(Emotions[i+1], Emotions[j+1]))
         print("Rapport di similarità tra {} e {}: {}".format(Emotions[i+1], Emotions[j+1], get_emotion_similarities(i+1, j+1, distance_typedir)))
+
+
