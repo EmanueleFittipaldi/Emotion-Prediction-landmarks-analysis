@@ -134,12 +134,12 @@ def vectorSimilarity(v1, v2):
     if len(v1) > len(v2):
         delta = len(v1) - len(v2)
         for i in range(delta):
-              # v2.append(statistics.mean(v2))
-             v2.append(0)
+             #  v2.append(statistics.mean(v2))
+              v2.append(0)
     elif len(v1) < len(v2):
         delta = len(v2) - len(v1)
         for i in range(delta):
-            # v1.append(statistics.mean(v1))
+             # v1.append(statistics.mean(v1))
              v1.append(0)
 
     return 1 - spatial.distance.cosine(v1, v2)
