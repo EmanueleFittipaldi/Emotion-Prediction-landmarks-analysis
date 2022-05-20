@@ -3,11 +3,10 @@ import os
 import pandas as pd
 from scipy import stats
 import numpy as np
-from matplotlib import pyplot as plt
 from scipy import spatial
 import statistics
-import csv
 
+import plot_utils as plot
 
 
 def normalTest(values):
@@ -143,3 +142,65 @@ def vectorSimilarity(v1, v2):
              v1.append(0)
 
     return 1 - spatial.distance.cosine(v1, v2)
+
+def subjects_per_emotion(Dataset_Emotion, distance_name):
+    emotion_dictionary = {}
+    for dir in Dataset_Emotion:
+        for file in os.listdir(dir):
+            if os.path.basename(file).find('emotion') != -1:
+                subject = file[:8] + distance_name + ".csv"
+                filename = os.path.join(dir, file)
+                f = open(filename, "r")
+                string_formatted = float(f.read().strip())
+                f.close()
+                if string_formatted in emotion_dictionary:
+                    emotion_dictionary[string_formatted].append(subject)
+                else:
+                    emotion_dictionary[string_formatted] = [subject]
+    return emotion_dictionary
+
+def get_distances_overT(frame, threshold):
+    """
+        ****
+       - **Returns**:
+       - **Value return** has type
+       - Parameter **values**:
+       - **Precondition**:
+       """
+    distances_overT = []
+    landmarks = []
+    for i in range(0,468):
+        if frame[i] > threshold:
+            distances_overT.append(frame[i])
+            landmarks.append(i)
+    return distances_overT, landmarks
+
+def process_threshold_landmarks(subject, emotion, frameSeq):
+    """
+                   funzione che calcola la threshold e ottiene i landmark che superano la threshold
+
+                  - **Returns**:
+                  - **Value return** has type
+                  - Parameter **values**:
+                  - **Precondition**:
+       """
+    number_rows = len(frameSeq.axes[0])
+
+    dist_ff = frameSeq.iloc[1:2, :468].values.tolist()
+    fldist_ff = [item for sublist in dist_ff for item in sublist]
+
+    dist_lf = frameSeq.iloc[number_rows-1:number_rows, :468].values.tolist()
+    fldist_lf = [item for sublist in dist_lf for item in sublist]
+
+    delta_distances = []
+    for i in range(0, 468):
+        delta = fldist_lf[i] - fldist_ff[i]
+        delta_distances.append(delta)
+
+    threshold = statistics.mean(delta_distances)
+
+    distancesOverT, significativeLandmarks = get_distances_overT(fldist_lf, threshold)
+    # plot.plot_significative_landmarks('Global Distances', subject, frameSeq, distancesOverT, significativeLandmarks)
+    # plot.plot_scatter3D(subject[:8], emotion, significativeLandmarks)
+
+    return distancesOverT, significativeLandmarks
