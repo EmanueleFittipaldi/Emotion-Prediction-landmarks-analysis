@@ -2,7 +2,7 @@ import os
 import csv
 import cv2
 import mediap_util as mpu
-import pandas as pd
+
 
 def extract_landmarks(dir,img):
     filename = 'frames_csv/'+str(img)
