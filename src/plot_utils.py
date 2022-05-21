@@ -1,9 +1,16 @@
 from matplotlib import pyplot as plt
-import numpy as np
 import os
 import pandas as pd
-# creazione grafico in cui mostriamo i landmark tra due frame di interesse
+
 def plot_frames_landmarks(distanceName, videoSequence, indexFirstFrame, indexSecondFrame):
+    """
+                    funzione che permette di creare un grafico in cui mostriamo i landmark tra due frame di interesse
+                   - **Returns**:
+                   - **Value return** has type
+                   - Parameter **values**:
+                   - **Precondition**:
+        """
+
     for i in range(len(videoSequence.columns) - 2):
         plt.plot(i, videoSequence.iloc[indexFirstFrame, i], color='blue', marker='o')  # primo frame
         plt.plot(i, videoSequence.iloc[indexSecondFrame, i], color='red', marker='^')  # frame di interesse
@@ -13,9 +20,14 @@ def plot_frames_landmarks(distanceName, videoSequence, indexFirstFrame, indexSec
     plt.grid(True)
     plt.show()
 
-# creazione grafico in cui mostriamo i landmark del primo frame e quelli significativi del frame di interesse
 def plot_significative_landmarks(distanceName, subject, videoSequence, distances, xAxis):
-
+    """
+                    funzione che permette di creare un grafico in cui mostriamo i landmark del primo frame e quelli significativi del frame di interesse
+                   - **Returns**:
+                   - **Value return** has type
+                   - Parameter **values**:
+                   - **Precondition**:
+        """
     for i in range(len(videoSequence.columns)-2):
         plt.plot(i, videoSequence.iloc[1, i], color='blue', marker='o') # primo frame
         if i in xAxis:
@@ -27,42 +39,15 @@ def plot_significative_landmarks(distanceName, subject, videoSequence, distances
     plt.grid(True)
     plt.show()
 
-
-def pvaluePlotter(Pvalue_history, splits):
-    """
-    This Function takes a list of pvalues and a list of splits where these pvalues where calculated and
-    creates a plot showing how pvalue changed according to the several splits.
-        - **Returns**: nothing
-
-        - Parameter **Pvalue_history**: a list of pvalues
-
-        - Parameter **splits**: a list of the split points where the pvalues where valuated
-
-        - **Precondition**: Pvalue_history and splits are lists of numbers
-    """
-    x = np.array(splits)
-    y = np.array(Pvalue_history)
-    plt.ylabel("pvalue")
-    plt.plot(x, y, color="red", marker="o", label="pvalue")
-    plt.legend()
-    plt.show()
-
-
-def histogramPlotter(data):
-    """
-     This Function takes a list of values and uses plt.hist() to plot them
-         - **Returns**: nothing
-
-         - Parameter **data**: a list of pvalues
-
-
-         - **Precondition**: list of values
-     """
-    plt.hist(data)
-    plt.show()
-
-
 def plot_scatter3D(subject, emotion, landmarksInvolved):
+    """
+                    funzione che permette di creare un grafico in cui mostriamo i landmark del primo frame e quelli significativi
+                    mostrando i punto su uno spazio tridimensionale
+                   - **Returns**:
+                   - **Value return** has type
+                   - Parameter **values**:
+                   - **Precondition**:
+        """
     sub_csv = []
     path_frames = "frames_csv/"
     for file in os.listdir(path_frames):
