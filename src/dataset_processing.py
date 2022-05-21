@@ -1,3 +1,5 @@
+""" queste funzioni effettuano un'elaborazione del dataset, estraendo i landmark dalle immagini e aggiungendo le etichette mancanti"""
+
 import os
 import Helper as hp
 import land_extractor as lext
@@ -9,18 +11,32 @@ import pandas as pd
 path_dataset = hp.getFromEnv('DatasetPath')
 # path label
 path_label = hp.getFromEnv('LabelPath')
-Dataset_folders = utils.getDirectories(path_dataset)
-Emotion_folders = utils.getDirectories(path_label)
+Dataset_folders = utils.getDirectories(path_dataset=path_dataset)
+Emotion_folders = utils.getDirectories(path_dataset=path_label)
 
-# estrazione landmarks dalle immagini
 def process_landmarks(Dataset_folders):
+    """
+                    funzione che estrae landmark dalle immagini
+
+                   - **Returns**:
+                   - **Value return** has type
+                   - Parameter **values**:
+                   - **Precondition**:
+    """
     # loop nelle diverse cartelle per andare ad ottenere le singole immagini dei soggetti ed estrarre i landmark
     for dir in sorted(Dataset_folders):
         for img in os.listdir(dir):
             lext.extract_landmarks(dir,img)
 
-# aggiunta delle etichette emozioni mancanti
 def missing_EmotionLabels():
+    """
+                    funzione che aggiunge le etichette delle emozioni mancanti
+
+                   - **Returns**:
+                   - **Value return** has type
+                   - Parameter **values**:
+                   - **Precondition**:
+        """
     # ottenimento delle cartelle in cui non sono presenti le etichette dell'emozioni
     missing_EMlabels = []
     for dir in sorted(Emotion_folders):
@@ -47,8 +63,15 @@ def missing_EmotionLabels():
                             f.close()
                             break
 
-# aggiunta delle etichette sui sessi
 def missing_GenderLabels():
+    """
+                    funzione che permette di aggiungere le etichette sui sessi
+
+                   - **Returns**:
+                   - **Value return** has type
+                   - Parameter **values**:
+                   - **Precondition**:
+        """
     for dir in sorted(Dataset_folders):
         all_imges = sorted(os.listdir(dir))
         if all_imges[0].startswith("."):
@@ -70,9 +93,16 @@ def missing_GenderLabels():
                     f.close()
                     break
 
-# aggiunta etichette di emozione e sesso ai csv delle distanze
 def insert_labels_to_csv(path_label, path_GDcsv):
-    dataset_labels = utils.getDirectories(path_label)
+    """
+                    funzione che permette di aggiungere etichette di emozione e sesso ai csv delle distanze
+
+                   - **Returns**:
+                   - **Value return** has type
+                   - Parameter **values**:
+                   - **Precondition**:
+        """
+    dataset_labels = utils.getDirectories(path_dataset=path_label)
     for dir in sorted(dataset_labels):
         for file in sorted(os.listdir(dir)):
             filename = os.path.join(dir, file)
