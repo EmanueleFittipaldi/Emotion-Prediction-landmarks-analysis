@@ -1,51 +1,8 @@
 import os
-
 import pandas as pd
 from scipy import stats
-import numpy as np
 from scipy import spatial
 import statistics
-
-import plot_utils as plot
-
-
-def normalTest(values):
-    """
-    This function takes a list of numerical values and conduct a normal test over these values returning a p2 value.
-    If this value is less than alpha, we conclude that the values were not drawn from a normal distribuition.
-
-    - **Returns**: 1 if we can reject the null hypotesis, meaning that the values were not drawn from a normal distribuition,otherwise we return 0, meaning that the values were drawn from a normal distribuition.
-    - **Value return** has type int.
-    - Parameter **values**: the list of numerical values on which we want to conduct the normal test
-    - **Precondition**: values is a list of numerical data
-
-    """
-    stat, p2 = stats.normaltest(values)
-    alpha = 1e-3
-    # print("p = {}".format(p2))
-    if p2 < alpha:
-        # the values were not drawn from a normal distribuition
-        # print("the null hp can be rejected")
-        return 1
-    else:
-        # the values were drawn from a normal distribuiton
-        # print("the null hp cannot be rejected")
-        return 0
-
-
-def normalizeData(data):
-    """
-     This Function takes a list of values and uses np.log() function to normalize them. After the application of this
-     function, all the data should now follow a normal distribuition.
-         - **Returns**: list of normalized values
-
-         - Parameter **data**: a list of numerical data
-
-
-         - **Precondition**: Data must be a list of values
-     """
-    return np.log(data)
-
 
 def pvalueTest(vec1, vec2, alphaValue):
     """
@@ -88,9 +45,14 @@ def getDirectories(path_dataset):
                         Dataset_folders.append(os.path.join(path_sdir, dir))
     return Dataset_folders
 
-
-# funzione per andare a calcolare le direzioni dei landmark su asse x e y
-def landmarks_XYdirections(subject, indexF):
+def landmarks_XYdirections(subject, indexFrame):
+    """
+     funzione per andare a calcolare le direzioni dei landmark su asse x e y
+         - **Returns**:
+         - **Value return**:
+         - Parameter **path_dataset**:
+         - **Precondition**:
+     """
     path_dir = "frames_csv"
     frames = []
     for file in sorted(os.listdir(path_dir)):
@@ -99,7 +61,7 @@ def landmarks_XYdirections(subject, indexF):
 
     landmarks_directions = {}
     firstFrame = pd.read_csv(frames[0])
-    lastFrame = pd.read_csv(frames[indexF])
+    lastFrame = pd.read_csv(frames[indexFrame])
 
     for i in range(468):
         directions = []
@@ -133,17 +95,23 @@ def vectorSimilarity(v1, v2):
     if len(v1) > len(v2):
         delta = len(v1) - len(v2)
         for i in range(delta):
-             #  v2.append(statistics.mean(v2))
               v2.append(0)
     elif len(v1) < len(v2):
         delta = len(v2) - len(v1)
         for i in range(delta):
-             # v1.append(statistics.mean(v1))
              v1.append(0)
 
     return 1 - spatial.distance.cosine(v1, v2)
 
 def subjects_per_emotion(Dataset_Emotion, distance_name):
+    """
+         funzione che permette di calcolare ad ottenere un dizionario in cui le chiavi sono le emozioni e i valori
+         i diversi soggetti corrispondenti (viene inserito il csv delle distanze)
+             - **Returns**:
+             - **Value return**:
+             - Parameter **path_dataset**:
+             - **Precondition**:
+         """
     emotion_dictionary = {}
     for dir in Dataset_Emotion:
         for file in os.listdir(dir):
@@ -161,7 +129,8 @@ def subjects_per_emotion(Dataset_Emotion, distance_name):
 
 def get_distances_overT(frame, threshold):
     """
-        ****
+        funzione che individua le distanze che superano una certa soglia ricevuta in input, insieme alle distanze vengono
+        ritornati anche i landmark corrispondenti
        - **Returns**:
        - **Value return** has type
        - Parameter **values**:
