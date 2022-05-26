@@ -1,18 +1,17 @@
 """ queste funzioni effettuano un'elaborazione del dataset, estraendo i landmark dalle immagini e aggiungendo le etichette mancanti"""
 
 import os
-import utils as ut
-import utils
+import utils as utils
 import cv2
 from matplotlib import pyplot as plt
 import pandas as pd
-import utils as p
+
 # path del dataset CK+
 path_dataset = "Dataset/cohn-kanade-images"
 # path label
 path_label = "Dataset/Emotion"
-Dataset_folders = utils.getDirectories(path_dataset=path_dataset)
-Emotion_folders = utils.getDirectories(path_dataset=path_label)
+Dataset_folders = utils.get_directories(path_dataset=path_dataset)
+Emotion_folders = utils.get_directories(path_dataset=path_label)
 
 def process_landmarks(Dataset_folders):
     """
@@ -26,9 +25,9 @@ def process_landmarks(Dataset_folders):
     # loop nelle diverse cartelle per andare ad ottenere le singole immagini dei soggetti ed estrarre i landmark
     for dir in sorted(Dataset_folders):
         for img in os.listdir(dir):
-            ut.extract_landmarks(dir,img)
+            utils.extract_landmarks(dir,img)
 
-def missing_EmotionLabels():
+def missing_emotion_labels():
     """
                     funzione che aggiunge le etichette delle emozioni mancanti
 
@@ -38,10 +37,8 @@ def missing_EmotionLabels():
                    - **Precondition**:
         """
     # ottenimento delle cartelle in cui non sono presenti le etichette dell'emozioni
-    missing_EMlabels = []
-    for dir in sorted(Emotion_folders):
-        if len(os.listdir(dir)) == 0:
-            missing_EMlabels.append(dir)
+    missing_EMlabels = [x for x in sorted(Emotion_folders) if len(x) == 0]
+
     if len(missing_EMlabels) == 0:
         print("Tutte le label per le emozioni sono state aggiunte")
     else:
@@ -63,7 +60,7 @@ def missing_EmotionLabels():
                             f.close()
                             break
 
-def missing_GenderLabels():
+def missing_gender_labels():
     """
                     funzione che permette di aggiungere le etichette sui sessi
 
@@ -74,14 +71,10 @@ def missing_GenderLabels():
         """
     for dir in sorted(Dataset_folders):
         all_imges = sorted(os.listdir(dir))
-        if all_imges[0].startswith("."):
-            path_image = os.path.join(dir, all_imges[1])
-        else:
-            path_image = os.path.join(dir, all_imges[0])
-        print(path_image)
         filename = os.path.join(dir, all_imges[len(os.listdir(dir)) - 1]) \
             .replace("cohn-kanade-images", "Emotion") \
             .replace(".png", "_gender.txt")
+
         if not os.path.exists(filename):
             while (True):
                 # Uomo = 0
@@ -102,27 +95,25 @@ def insert_labels_to_csv(path_label, path_GDcsv):
                    - Parameter **values**:
                    - **Precondition**:
         """
-    dataset_labels = utils.getDirectories(path_dataset=path_label)
+    dataset_labels = utils.get_directories(path_dataset=path_label)
     for dir in sorted(dataset_labels):
         for file in sorted(os.listdir(dir)):
             filename = os.path.join(dir, file)
-            # print(filename)
+
             f = open(filename, "r")
             string_formatted = f.read().strip()
             f.close()
-            # print(string_formatted)
-            for csv in os.listdir(path_GDcsv):
-                if os.path.basename(csv).startswith(file[:8]):
-                    df = pd.read_csv(os.path.join(path_GDcsv,csv), header=None)
-                    df[len(df.columns)] = string_formatted
-                    df.to_csv(os.path.join(path_GDcsv,csv), index=False,header=None)
+
+            csv = [c for c in os.listdir(path_GDcsv) if os.path.basename(c).startswith(file[:8])]
+            df = pd.read_csv(os.path.join(path_GDcsv, csv), header=None)
+            df[len(df.columns)] = string_formatted
+            df.to_csv(os.path.join(path_GDcsv, csv), index=False, header=None)
 
 # process_landmarks(Dataset_folders)
-missing_EmotionLabels()
-# missing_GenderLabels()
+missing_emotion_labels()
+missing_gender_labels()
 # insert_labels_to_csv("Dataset/Emotion", "Global_Distances")
 # insert_labels_to_csv("Dataset/Emotion", "Local_Distances")
 
-print(p.landmarks_XYdirections("S005_001", 2))
 
 

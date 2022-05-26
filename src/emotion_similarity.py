@@ -10,7 +10,7 @@ Emotions = {1: "Anger",
             }
 # Ottenimento delle cartelle che contengono le label delle emozioni di ogni soggetto
 PATH_EMOTION = "Dataset/Emotion"
-DatasetEmotion = getDirectories(PATH_EMOTION)
+DatasetEmotion = get_directories(PATH_EMOTION)
 DISTANCE_NAME = "_GD_euclidean"
 DISTANCE_TYPEDIR = "Global_Distances/"
 DISTANCES_FLAG = 1
@@ -60,7 +60,6 @@ def get_emotion_similarities(flag_sign, emotion1, emotion2, distance_dir):
            """
     # ottengo tutti i soggetti dell'emozione 1
     em1_subjects = emotion_dictionary[emotion1]
-
     # ottengo tutti i soggetti dell'emozione 2
     em2_subjects = emotion_dictionary[emotion2]
 
@@ -78,7 +77,7 @@ def get_emotion_similarities(flag_sign, emotion1, emotion2, distance_dir):
         for key1 in emotion1_sign:
             for key2 in emotion2_sign:
                 if key1 == key2: continue
-                sim = vectorSimilarity(v1=emotion1_sign[key1], v2=emotion2_sign[key2])
+                sim = vector_similarity(v1=emotion1_sign[key1], v2=emotion2_sign[key2])
                 all_similarities.append(sim)
     elif flag_sign == LANDMARKS_FLAG: # landmarks
         for key1 in emotion1_sign:
@@ -86,7 +85,7 @@ def get_emotion_similarities(flag_sign, emotion1, emotion2, distance_dir):
                 if key1 == key2: continue
                 flat_em1 = [item for sublist in emotion1_sign[key1] for item in sublist]
                 flat_em2 = [item for sublist in emotion2_sign[key2] for item in sublist]
-                sim = vectorSimilarity(v1=flat_em1, v2=flat_em2)
+                sim = vector_similarity(v1=flat_em1, v2=flat_em2)
                 all_similarities.append(sim)
 
     return statistics.mean(all_similarities)

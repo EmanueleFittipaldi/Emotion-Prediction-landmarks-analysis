@@ -76,3 +76,22 @@ def plot_scatter3D(subject, emotion, landmarksInvolved, indexFrame):
     plt.title("Person: " + subject + " Emotion: " + str(emotion))
     ax.set_axis_off()
     plt.show()
+
+
+def plot_subjects_results(data):
+    """
+                    funzione che mostra il numero di occorrenze di ogni sequenza di frame su tutti i soggetti.
+                   - **Returns**:
+                   - **Value return** has type
+                   - Parameter **values**:
+                   - **Precondition**:
+        """
+    list_axisX = []
+    for key in data:
+        list_axisX.append(str(data[key][0]))
+    axisX = set(list_axisX)
+    plt.hist(sorted(list_axisX), bins=len(axisX))
+    plt.ylabel('Soggetti')
+    plt.xlabel('Sequenze frame')
+    plt.title('Micro-espressione rilevata')
+    plt.show()

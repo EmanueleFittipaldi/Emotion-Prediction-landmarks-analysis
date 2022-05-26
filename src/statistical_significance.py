@@ -1,6 +1,5 @@
 import json
 from utils import *
-import matplotlib.pyplot as plt
 
 # Gathering all the csv containing local distances computed using euclidean and manhattan metric into two separate lists.
 Local_Distances_euclidean = ["Local_Distances/" + x for x in os.listdir("Local_Distances/") if "euclidean.csv" in x]
@@ -13,7 +12,6 @@ Local_Distances_manhattan = ["Local_Distances/" + x for x in os.listdir("Local_D
 ALPHA = 0.05
 MAX_FRAMES = 6
 
-
 def get_statistical_significance():
     """
                     This function extracts all the meaningful landmarks using a test called two-tailed significance test.
@@ -24,16 +22,18 @@ def get_statistical_significance():
         """
     subjects_split_history = {}
     for path in sorted(Local_Distances_euclidean):
+
         videoSequence = pd.read_csv(path, header=None)
         splits = list(range(2, len(videoSequence) - 1))
+
         LandmarksPerSplit = {}
         for split in splits:
             landmarkSignificativi = []
             df_1 = videoSequence.iloc[:split, :]
             df_2 = videoSequence.iloc[split:, :]
             for i in range(0, 467):
-                significant = pvalueTest(vec1=df_1[i], vec2=df_2[i], alphaValue=ALPHA)
-                if significant[0]:
+                bool, significant = pvalue_test(vec1=df_1[i], vec2=df_2[i], alphaValue=ALPHA)
+                if bool:
                     landmarkSignificativi.append(i)
             LandmarksPerSplit[split] = landmarkSignificativi
 
@@ -42,6 +42,7 @@ def get_statistical_significance():
             size_list = MAX_FRAMES
         else:
             size_list = len(key_list)
+
         for i in range(1, size_list):
             key1 = key_list[i - 1]
             key2 = key_list[i]
@@ -52,33 +53,10 @@ def get_statistical_significance():
         if maxValue == 0 and split == 0:
             subjects_split_history[path[16:24]] = [[1, 2, 3], LandmarksPerSplit[2]]
         else:
-            print("Subject: {}, split: {}".format(path[16:24], split))
-            print("Subject: {}, split: {}, landmarks: {}, #: {}".format(path[16:24], [split - 1, split, split + 1],
-                                                                        LandmarksPerSplit[split],
-                                                                        len(LandmarksPerSplit[split])))
-
             subjects_split_history[path[16:24]] = [[split - 1, split, split + 1], LandmarksPerSplit[split]]
 
             with open('subjects_significative_frame.json', 'w') as convert_file:
                 convert_file.write(json.dumps(subjects_split_history))
-
-def plot_subjects_results(data):
-    """
-                    funzione che mostra il numero di occorrenze di ogni sequenza di frame su tutti i soggetti.
-                   - **Returns**:
-                   - **Value return** has type
-                   - Parameter **values**:
-                   - **Precondition**:
-        """
-    list_axisX = []
-    for key in data:
-        list_axisX.append(str(data[key][0]))
-    axisX = set(list_axisX)
-    plt.hist(sorted(list_axisX), bins=len(axisX))
-    plt.ylabel('Soggetti')
-    plt.xlabel('Sequenze frame')
-    plt.title('Micro-espressione rilevata')
-    plt.show()
 
 def max_occurences_frame():
     """
@@ -89,7 +67,7 @@ def max_occurences_frame():
                    - Parameter **values**:
                    - **Precondition**:
         """
-    emotion_directory = subjects_per_emotion(Dataset_Emotion=getDirectories("Dataset/Emotion"), distance_name="_GD_euclidean")
+    emotion_directory = subjects_per_emotion(Dataset_Emotion=get_directories("Dataset/Emotion"), distance_name="_GD_euclidean")
 
     dic_mode = {}
     for key in sorted(emotion_directory):
@@ -102,7 +80,6 @@ def max_occurences_frame():
 
     for key in dic_mode:
         print("Emozione {}, numero di occorrenze maggiore: {}".format(key, statistics.mode(dic_mode[key])))
-
 
 
 get_statistical_significance()

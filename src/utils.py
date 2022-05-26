@@ -1,7 +1,6 @@
 import os
 import pandas as pd
-from scipy import stats
-from scipy import spatial
+from scipy import stats, spatial
 import statistics
 import cv2
 import mediap_util as mpu
@@ -16,18 +15,11 @@ def extract_landmarks(dir,img):
                   - Parameter **values**:
                   - **Precondition**:
        """
-    filename = 'frames_csv/'+str(img)
-    filename = filename.replace('.png', '.csv')
+    filename = ('frames_csv/'+str(img)).replace('.png', '.csv')
+    file = open(filename, 'w')
+    writer = csv.writer(file)
+    writer.writerow(['x','y','z'])
 
-    # creazione file csv per la singola immagine
-    f = open(filename, 'w')
-    # creazione del writer per scrivere le righe nel csv
-    writer = csv.writer(f)
-    # colonne csv
-    header = ['x','y','z']
-    writer.writerow(header)
-
-    # lettura immagine ed estrazione dei landmark
     image = cv2.imread(os.path.join(dir, img))
     num_faces, keypoints = mpu.TESS(image)
 
@@ -35,12 +27,10 @@ def extract_landmarks(dir,img):
     data = []
     for row in keypoints:
         data.append(row)
-    # scrittura di tutte le righe nel csv
     writer.writerows(data)
+    file.close()
 
-    f.close()
-
-def pvalueTest(vec1, vec2, alphaValue):
+def pvalue_test(vec1, vec2, alphaValue):
     """
      This Function takes two lists of numerical values representing two hypotetically distinguished distribuitions of values,
      and an alpha value. Through pvalue we compare these two distribuitions, returning if they are statistically different.
@@ -56,7 +46,7 @@ def pvalueTest(vec1, vec2, alphaValue):
     else:
         return False, res
 
-def getDirectories(path_dataset):
+def get_directories(path_dataset):
     """
      This Function takes as input the path of the Dataset and returns a list containing all the paths for the directories
      of each videosequence.
@@ -111,7 +101,7 @@ def landmarks_XYdirections(subject, indexFrame):
 
     return landmarks_directions
 
-def vectorSimilarity(v1, v2):
+def vector_similarity(v1, v2):
     """
       This Function takes as input two lists of numerical values and return in % how similiar they are using the spatial distance
       cosine.
@@ -121,13 +111,11 @@ def vectorSimilarity(v1, v2):
           - **Precondition**:v1,v2 must be numerical values
       """
     if len(v1) > len(v2):
-        delta = len(v1) - len(v2)
-        for i in range(delta):
-              v2.append(0)
+        while len(v2) < len(v1):
+            v2.append(0)
     elif len(v1) < len(v2):
-        delta = len(v2) - len(v1)
-        for i in range(delta):
-             v1.append(0)
+        while len(v1) < len(v2):
+            v1.append(0)
 
     return 1 - spatial.distance.cosine(v1, v2)
 
