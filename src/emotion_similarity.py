@@ -93,16 +93,29 @@ def get_emotion_similarities(flag_sign, emotion1, emotion2, distance_dir):
 
 
 # print(emotion_dictionary)
+columns = { 1: [0, 0, 0, 0, 0, 0, 0],
+            2: [0, 0, 0, 0, 0, 0, 0],
+            3: [0, 0, 0, 0, 0, 0, 0],
+            4: [0, 0, 0, 0, 0, 0, 0],
+            5: [0, 0, 0, 0, 0, 0, 0],
+            6: [0, 0, 0, 0, 0, 0, 0],
+            7: [0, 0, 0, 0, 0, 0, 0],
+            }
+df_landmarks = pd.DataFrame(columns, index=[1, 2, 3, 4, 5, 6, 7])
+df_landmarks = df_landmarks.astype(float)
 
-print("CONFRONTO TRA EMOZIONI CONSIDERANDO LE DISTANZE O I LANDMARK SIGNIFICATIVE NELLE DISTANZE GLOBALI")
+df_distances = pd.DataFrame(columns, index=[1, 2, 3, 4, 5, 6, 7])
+df_distances = df_distances.astype(float)
+
 # confrontare le diverse emozioni di tutti i soggetti e visualizzare la similarità tra i landmark significativi estratti
 for i in range(EMOTIONS_NUMBER):
     print("\n")
     for j in range(EMOTIONS_NUMBER):
-        print("\nDISTANZE -> {} / {}: {}".format(Emotions[i + 1].upper(), Emotions[j + 1].upper(),
-                                                             get_emotion_similarities(flag_sign=DISTANCES_FLAG, emotion1=i + 1,
-                                                                                      emotion2=j + 1, distance_dir=DISTANCE_TYPEDIR)))
-        print("LANDMARK -> {} / {}: {}".format(Emotions[i + 1].upper(), Emotions[j + 1].upper(),
-                                                                       get_emotion_similarities(flag_sign=LANDMARKS_FLAG, emotion1=i + 1,
-                                                                                                emotion2=j + 1, distance_dir=DISTANCE_TYPEDIR)))
+        df_distances[i + 1][j + 1] = get_emotion_similarities(flag_sign=DISTANCES_FLAG, emotion1=i + 1,
+                                                                                      emotion2=j + 1, distance_dir=DISTANCE_TYPEDIR)
+        df_landmarks[i + 1][j + 1] = get_emotion_similarities(flag_sign=LANDMARKS_FLAG, emotion1=i + 1,
+                                                              emotion2=j + 1, distance_dir=DISTANCE_TYPEDIR)
+
+print("MATRICE SIM DISTANZE: \n", df_distances)
+print("MATRICE SIM LANDMARK: \n", df_landmarks)
 

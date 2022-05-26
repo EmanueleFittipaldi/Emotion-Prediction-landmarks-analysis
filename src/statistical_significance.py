@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 
 Local_Distances_euclidean = ["Local_Distances/" + x for x in os.listdir("Local_Distances/") if "euclidean.csv" in x]
 Local_Distances_manhattan = ["Local_Distances/" + x for x in os.listdir("Local_Distances/") if "manhattan.csv" in x]
+
 ALPHA = 0.05
 MAX_FRAMES = 6
 
@@ -27,16 +28,12 @@ def get_statistical_significance():
             df_1 = videoSequence.iloc[:split, :]
             df_2 = videoSequence.iloc[split:, :]
             for i in range(0, 467):
-                landmark = i
-                significant = pvalueTest(vec1=df_1[landmark], vec2=df_2[landmark], alphaValue=ALPHA)
+                significant = pvalueTest(vec1=df_1[i], vec2=df_2[i], alphaValue=ALPHA)
                 if significant[0]:
-                    landmarkSignificativi.append(landmark)
+                    landmarkSignificativi.append(i)
             LandmarksPerSplit[split] = landmarkSignificativi
 
-        maxValue = 0
-        split = 0
-        key_list = list(LandmarksPerSplit)
-        size_list = 0
+        maxValue = 0; split = 0; key_list = list(LandmarksPerSplit); size_list = 0
         if len(key_list) > MAX_FRAMES:
             size_list = MAX_FRAMES
         else:
@@ -60,7 +57,6 @@ def get_statistical_significance():
 
             with open('subjects_significative_frame.json', 'w') as convert_file:
                 convert_file.write(json.dumps(subjects_split_history))
-
 
 def plot_subjects_results(data):
     """
@@ -105,10 +101,10 @@ def max_occurences_frame():
 
 
 
-# get_statistical_significance()
+get_statistical_significance()
 
 with open('subjects_significative_frame.json') as json_file:
     data = json.load(json_file)
 
 # plot_results(data)
-max_occurences_frame()
+# max_occurences_frame()

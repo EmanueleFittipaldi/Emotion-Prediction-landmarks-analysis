@@ -1,12 +1,11 @@
 import os
-import Helper as hp
 import csv
 import pandas as pd
 from scipy.spatial import distance
 
 # Reperisco il path della cartella dove sono memorizzati
 # tutti i csv contenenti i landmarks
-path_csv = hp.getFromEnv('CsvPath')
+path_csv = "frames_csv"
 Csv_files = sorted(os.listdir(path_csv))
 
 

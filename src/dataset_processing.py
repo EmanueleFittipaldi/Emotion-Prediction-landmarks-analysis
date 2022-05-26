@@ -1,16 +1,16 @@
 """ queste funzioni effettuano un'elaborazione del dataset, estraendo i landmark dalle immagini e aggiungendo le etichette mancanti"""
 
 import os
-import Helper as hp
-import land_extractor as lext
+import utils as ut
 import utils
 import cv2
 from matplotlib import pyplot as plt
 import pandas as pd
+import utils as p
 # path del dataset CK+
-path_dataset = hp.getFromEnv('DatasetPath')
+path_dataset = "Dataset/cohn-kanade-images"
 # path label
-path_label = hp.getFromEnv('LabelPath')
+path_label = "Dataset/Emotion"
 Dataset_folders = utils.getDirectories(path_dataset=path_dataset)
 Emotion_folders = utils.getDirectories(path_dataset=path_label)
 
@@ -26,7 +26,7 @@ def process_landmarks(Dataset_folders):
     # loop nelle diverse cartelle per andare ad ottenere le singole immagini dei soggetti ed estrarre i landmark
     for dir in sorted(Dataset_folders):
         for img in os.listdir(dir):
-            lext.extract_landmarks(dir,img)
+            ut.extract_landmarks(dir,img)
 
 def missing_EmotionLabels():
     """
@@ -123,5 +123,6 @@ missing_EmotionLabels()
 # insert_labels_to_csv("Dataset/Emotion", "Global_Distances")
 # insert_labels_to_csv("Dataset/Emotion", "Local_Distances")
 
+print(p.landmarks_XYdirections("S005_001", 2))
 
 

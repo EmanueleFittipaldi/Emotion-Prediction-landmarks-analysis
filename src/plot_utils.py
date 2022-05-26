@@ -39,7 +39,7 @@ def plot_significative_landmarks(distanceName, subject, videoSequence, distances
     plt.grid(True)
     plt.show()
 
-def plot_scatter3D(subject, emotion, landmarksInvolved):
+def plot_scatter3D(subject, emotion, landmarksInvolved, indexFrame):
     """
                     funzione che permette di creare un grafico in cui mostriamo i landmark del primo frame e quelli significativi
                     mostrando i punto su uno spazio tridimensionale
@@ -56,7 +56,7 @@ def plot_scatter3D(subject, emotion, landmarksInvolved):
     sub_csv = sorted(sub_csv)
 
     ff = pd.read_csv(sub_csv[0])
-    lf = pd.read_csv(sub_csv[len(sub_csv)-1])
+    lf = pd.read_csv(sub_csv[indexFrame])
 
     fig = plt.figure(figsize=(12, 12))
     ax = fig.add_subplot(projection='3d')
@@ -70,7 +70,9 @@ def plot_scatter3D(subject, emotion, landmarksInvolved):
         coordy_lf.append(lf.iloc[val:val + 1, 1:2])
         coordz_lf.append(lf.iloc[val:val + 1, 2:3])
 
-    ax.scatter3D(ff['x'], ff['y'], ff['z'], color='blue')
+
     ax.scatter3D(coordx_lf, coordy_lf, coordz_lf, color='red')
+    ax.scatter3D(ff['x'], ff['y'], ff['z'], color='blue', alpha=0.2)
     plt.title("Person: " + subject + " Emotion: " + str(emotion))
+    ax.set_axis_off()
     plt.show()

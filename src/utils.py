@@ -3,6 +3,42 @@ import pandas as pd
 from scipy import stats
 from scipy import spatial
 import statistics
+import cv2
+import mediap_util as mpu
+import csv
+
+def extract_landmarks(dir,img):
+    """
+                   funzione che estrae i landmark e crea il csv
+
+                  - **Returns**:
+                  - **Value return** has type
+                  - Parameter **values**:
+                  - **Precondition**:
+       """
+    filename = 'frames_csv/'+str(img)
+    filename = filename.replace('.png', '.csv')
+
+    # creazione file csv per la singola immagine
+    f = open(filename, 'w')
+    # creazione del writer per scrivere le righe nel csv
+    writer = csv.writer(f)
+    # colonne csv
+    header = ['x','y','z']
+    writer.writerow(header)
+
+    # lettura immagine ed estrazione dei landmark
+    image = cv2.imread(os.path.join(dir, img))
+    num_faces, keypoints = mpu.TESS(image)
+
+    # struttura dati che contiene i landmark divisi per righe (468x3)
+    data = []
+    for row in keypoints:
+        data.append(row)
+    # scrittura di tutte le righe nel csv
+    writer.writerows(data)
+
+    f.close()
 
 def pvalueTest(vec1, vec2, alphaValue):
     """
@@ -19,7 +55,6 @@ def pvalueTest(vec1, vec2, alphaValue):
         return True, res
     else:
         return False, res
-
 
 def getDirectories(path_dataset):
     """
@@ -53,11 +88,9 @@ def landmarks_XYdirections(subject, indexFrame):
          - Parameter **path_dataset**:
          - **Precondition**:
      """
-    path_dir = "frames_csv"
-    frames = []
-    for file in sorted(os.listdir(path_dir)):
-        if file.startswith(subject):
-            frames.append(os.path.join(path_dir, file))
+    path_dir = "frames_csv/"
+
+    frames = [path_dir + x for x in sorted(os.listdir(path_dir)) if subject in x]
 
     landmarks_directions = {}
     firstFrame = pd.read_csv(frames[0])
@@ -65,16 +98,11 @@ def landmarks_XYdirections(subject, indexFrame):
 
     for i in range(468):
         directions = []
-        coordXFirst = firstFrame['x'][i]
-        coordXLast = lastFrame['x'][i]
-        coordYFirst = firstFrame['y'][i]
-        coordYLast = lastFrame['y'][i]
-
-        if (coordXLast - coordXFirst) > 0:
+        if (lastFrame['x'][i] - firstFrame['x'][i]) > 0:
             directions.append(+1)
         else:
             directions.append(-1)
-        if (coordYLast - coordYFirst) > 0:
+        if (lastFrame['y'][i] - firstFrame['y'][i]) > 0:
             directions.append(+1)
         else:
             directions.append(-1)

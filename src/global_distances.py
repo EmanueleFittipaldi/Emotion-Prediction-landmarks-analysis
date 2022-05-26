@@ -7,7 +7,7 @@ from scipy import spatial
 # la distanza globale è calcolata su ogni frame rispetto al primo della sequenza
 path_fcsv = "frames_csv"
 
-def distance_calc(path_globaldcsv, namePath, nameDist):
+def gloabl_distances(path_globaldcsv, namePath, nameDist):
     listDistances = ['EUCLIDEAN', 'MANHATTAN']
     if nameDist in listDistances:
         # creazione cartella principale inerente alla distanza richiesta se non esiste già
@@ -68,8 +68,11 @@ def distance_calc(path_globaldcsv, namePath, nameDist):
     else:
          print("Nome distanza da calcolare errata!")
 
+def local_distances():
+    print("prova")
+
 # calcolo della distanza euclidea
-# distance_calc("GD_euclidean_csv", "GD_euclidean.csv", "EUCLIDEAN")
+# gloabl_distances("GD_euclidean_csv", "GD_euclidean.csv", "EUCLIDEAN")
 
 # calcolo della distanza di manhattan
-# distance_calc("GD_manhattan_csv", "GD_manhattan.csv", "MANHATTAN")
+# gloabl_distances("GD_manhattan_csv", "GD_manhattan.csv", "MANHATTAN")
