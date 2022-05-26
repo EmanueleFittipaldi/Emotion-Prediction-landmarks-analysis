@@ -8,12 +8,12 @@ import csv
 
 def extract_landmarks(dir,img):
     """
-                   funzione che estrae i landmark e crea il csv
-
-                  - **Returns**:
-                  - **Value return** has type
-                  - Parameter **values**:
-                  - **Precondition**:
+       This Function takes in input the path of directory and image included in this directory,
+       extracts 468 landmarks and places the results in a csv file.
+          - **Returns**: null.
+          - **Value return** has type null.
+          - Parameter **values**: path of directory, image
+          - **Precondition**: dir type string, path of the image
        """
     filename = ('frames_csv/'+str(img)).replace('.png', '.csv')
     file = open(filename, 'w')
@@ -72,11 +72,13 @@ def get_directories(path_dataset):
 
 def landmarks_XYdirections(subject, indexFrame):
     """
-     funzione per andare a calcolare le direzioni dei landmark su asse x e y
-         - **Returns**:
-         - **Value return**:
-         - Parameter **path_dataset**:
-         - **Precondition**:
+     This function takes as input a person and a frame index of interest from which to obtain the distances and calculate
+     the directions on the x and y axes of the landmarks with respect to the first frame.
+    Give +1 if it's the same direction, -1 otherwise.
+         - **Returns**: list of landmarks directions.
+         - **Value return** has type list.
+         - Parameter **path_dataset**: subject, frame index of interest
+         - **Precondition**: subject type string and in the form: "SXXX_XXX", indexFrame type integer.
      """
     path_dir = "frames_csv/"
 
@@ -121,12 +123,12 @@ def vector_similarity(v1, v2):
 
 def subjects_per_emotion(Dataset_Emotion, distance_name):
     """
-         funzione che permette di calcolare ad ottenere un dizionario in cui le chiavi sono le emozioni e i valori
-         i diversi soggetti corrispondenti (viene inserito il csv delle distanze)
-             - **Returns**:
-             - **Value return**:
-             - Parameter **path_dataset**:
-             - **Precondition**:
+    This Function takes as input a emotions dataset and distance name (to get the CSV files of the distance of interest),
+    creates a dictionary in which the keys are the emotions and the values are the subjects of that key emotion.
+             - **Returns**: dictionary that contains subjects divided by emotions.
+             - **Value return**: dictionary.
+             - Parameter **path_dataset**: emotions dataset, distance name of interest.
+             - **Precondition**: distance name type string.
          """
     emotion_dictionary = {}
     for dir in Dataset_Emotion:
@@ -145,12 +147,12 @@ def subjects_per_emotion(Dataset_Emotion, distance_name):
 
 def get_distances_overT(frame, threshold):
     """
-        funzione che individua le distanze che superano una certa soglia ricevuta in input, insieme alle distanze vengono
-        ritornati anche i landmark corrispondenti
-       - **Returns**:
-       - **Value return** has type
-       - Parameter **values**:
-       - **Precondition**:
+    This Function takes as input a frame of interest and a threshold, checks for each landmark of the frame if its distance
+    is a greater than the threshold, this mean that the landmark is significant and its distance and a number are inserted in a list (corresponds to the landmark).
+       - **Returns**: two list: a list of all significant distances and a list of all significant landmarks.
+       - **Value return** has type list, list
+       - Parameter **values**: frame of interest, is a pandas dataframe, threshold a float.
+       - **Precondition**: frame of interest must be a dataframe.
        """
     distances_overT = []
     landmarks = []
@@ -162,12 +164,12 @@ def get_distances_overT(frame, threshold):
 
 def process_threshold_landmarks(subject, emotion, frameSeq):
     """
-                   funzione che calcola la threshold e ottiene i landmark che superano la threshold
-
-                  - **Returns**:
-                  - **Value return** has type
-                  - Parameter **values**:
-                  - **Precondition**:
+    This Function takes as input a sequence of frames of the subject of interest, and calculate a threshold.
+    The threshold is the average of the differences between the distances.
+          - **Returns**:
+          - **Value return** has type
+          - Parameter **values**:
+          - **Precondition**:
        """
     number_rows = len(frameSeq.axes[0])
 
@@ -185,6 +187,8 @@ def process_threshold_landmarks(subject, emotion, frameSeq):
     threshold = statistics.mean(delta_distances)
 
     distancesOverT, significativeLandmarks = get_distances_overT(fldist_lf, threshold)
+
+    # plot a histogram or a 3D graph to visualize significant landmarks
     # plot.plot_significative_landmarks('Global Distances', subject, frameSeq, distancesOverT, significativeLandmarks)
     # plot.plot_scatter3D(subject[:8], emotion, significativeLandmarks)
 
