@@ -2,17 +2,21 @@ import json
 from utils import *
 import matplotlib.pyplot as plt
 
+# Gathering all the csv containing local distances computed using euclidean and manhattan metric into two separate lists.
 Local_Distances_euclidean = ["Local_Distances/" + x for x in os.listdir("Local_Distances/") if "euclidean.csv" in x]
 Local_Distances_manhattan = ["Local_Distances/" + x for x in os.listdir("Local_Distances/") if "manhattan.csv" in x]
 
+# ALPHA: Threshold by which we estabilish if there is any statistical significance difference between two populations
+# MAX_FRAMES: Since micro-expressions are characterized by being faint and poor lasting, we expect them to happen only
+# in the very first frames of a videose quence. For that reason we only consider the first 6 frames of a video sequence
+# in order to detect a micro movement.
 ALPHA = 0.05
 MAX_FRAMES = 6
 
 
 def get_statistical_significance():
     """
-                    funzione che estrae i landmark significativi effettuano il test two-tailed, andando ad individuare in quale frame
-                    c'è una variazione significativa.
+                    This function extracts all the meaningful landmarks using a test called two-tailed significance test.
                    - **Returns**:
                    - **Value return** has type
                    - Parameter **values**:
