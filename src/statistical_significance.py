@@ -55,7 +55,7 @@ def get_statistical_significance():
         else:
             subjects_split_history[path[16:24]] = [[split - 1, split, split + 1], LandmarksPerSplit[split]]
 
-            with open('subjects_significative_frame.json', 'w') as convert_file:
+            with open('micro-expression_results/subjects_significative_frame.json', 'w') as convert_file:
                 convert_file.write(json.dumps(subjects_split_history))
 
 def max_occurences_frame():
@@ -84,7 +84,7 @@ def max_occurences_frame():
 
 get_statistical_significance()
 
-with open('subjects_significative_frame.json') as json_file:
+with open('micro-expression_results/subjects_significative_frame.json') as json_file:
     data = json.load(json_file)
 
 # plot_results(data)

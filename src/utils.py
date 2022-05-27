@@ -9,7 +9,7 @@ import csv
 def extract_landmarks(dir,img):
     """
        This Function takes in input the path of directory and image included in this directory,
-       extracts 468 landmarks and places the results in a csv file.
+       extracts 468 landmarks and places the micro-expression_results in a csv file.
           - **Returns**: null.
           - **Value return** has type null.
           - Parameter **values**: path of directory, image
