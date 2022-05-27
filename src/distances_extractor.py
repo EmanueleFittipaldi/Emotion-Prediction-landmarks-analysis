@@ -112,7 +112,7 @@ def local_distances(nameDist):
             writer.writerow(FirstEmptyRow)
             f.close()
 
-    for VideoSequence in sorted(os.listdir("/Users/emanuelefittipaldi/PycharmProjects/Emotion_Prediction_Project/src/Local_Distances/")):
+    for VideoSequence in sorted(os.listdir("Local_Distances/")):
 
        # Since the Local_Distances folder may contain different csv for different metrics, I need to check
        # if I am opening the right csv.

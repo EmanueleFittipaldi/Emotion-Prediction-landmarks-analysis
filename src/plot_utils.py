@@ -4,16 +4,20 @@ import pandas as pd
 
 def plot_frames_landmarks(distanceName, videoSequence, indexFirstFrame, indexSecondFrame):
     """
-                    funzione che permette di creare un grafico in cui mostriamo i landmark tra due frame di interesse
-                   - **Returns**:
-                   - **Value return** has type
-                   - Parameter **values**:
-                   - **Precondition**:
-        """
+                    This function create plots all the distances of landmarks belonging to two different frames.
+                    Distances belonging to first frame are shown in blue while distnces belonging to frame two are
+                    shown in red.
+
+                   - Parameter **distanceName**: String. name of the metric used as a distance
+                   - Parameter **videoSequence**: csv containing all the distances of a video sequence
+                   - Parameter **indexFirstFrame**: index of the first frame to be considered
+                   - Parameter **indexSecondFrame**: index of the second frame to be considered
+
+    """
 
     for i in range(len(videoSequence.columns) - 2):
-        plt.plot(i, videoSequence.iloc[indexFirstFrame, i], color='blue', marker='o')  # primo frame
-        plt.plot(i, videoSequence.iloc[indexSecondFrame, i], color='red', marker='^')  # frame di interesse
+        plt.plot(i, videoSequence.iloc[indexFirstFrame, i], color='blue', marker='o')  # first frame
+        plt.plot(i, videoSequence.iloc[indexSecondFrame, i], color='red', marker='^')  # frame of interest
 
     plt.xlabel('Landmarks', fontsize=14)
     plt.ylabel(distanceName, fontsize=14)
@@ -22,16 +26,18 @@ def plot_frames_landmarks(distanceName, videoSequence, indexFirstFrame, indexSec
 
 def plot_significative_landmarks(distanceName, subject, videoSequence, distances, xAxis):
     """
-                    funzione che permette di creare un grafico in cui mostriamo i landmark del primo frame e quelli significativi del frame di interesse
-                   - **Returns**:
-                   - **Value return** has type
-                   - Parameter **values**:
-                   - **Precondition**:
-        """
+                    This function creates a plot depicting all the landmarks belonging to the first frame and all the significant landmarks
+                    belonging to the frame of interest.
+                   - Parameter **distanceName**: String. name of the metric used as a distance
+                   - Parameter **subject**: String. name of the subject
+                   - Parameter **videoSequence**: Dataframe. Videosequence containg all the distances.
+                   - Parameter **distances**: list of distances
+                   - Parameter **xAxis**: axis to be considered, X in this case
+    """
     for i in range(len(videoSequence.columns)-2):
-        plt.plot(i, videoSequence.iloc[1, i], color='blue', marker='o') # primo frame
+        plt.plot(i, videoSequence.iloc[1, i], color='blue', marker='o') # first frame
         if i in xAxis:
-            plt.plot(i, distances[xAxis.index(i)], color='red', marker='^') # landmark che hanno superato la soglia
+            plt.plot(i, distances[xAxis.index(i)], color='red', marker='^') # landmarks that have crossed the threshold
 
     plt.title(subject)
     plt.xlabel('Landmarks', fontsize=14)
@@ -41,12 +47,12 @@ def plot_significative_landmarks(distanceName, subject, videoSequence, distances
 
 def plot_scatter3D(subject, emotion, landmarksInvolved, indexFrame):
     """
-                    funzione che permette di creare un grafico in cui mostriamo i landmark del primo frame e quelli significativi
-                    mostrando i punto su uno spazio tridimensionale
-                   - **Returns**:
-                   - **Value return** has type
-                   - Parameter **values**:
-                   - **Precondition**:
+                    This function creates a plots where all the landmarks belonging to the first frame and all the landmarks belonging
+                    to the significant frame are shown. We use blue to depict first landmarks and red the significant landmarks. This plot is in 3D.
+                   - Parameter **subject**:
+                   - Parameter **emotion**:
+                   - Parameter **landmarksInvolved**:
+                    - Parameter **indexFrame**:
         """
     sub_csv = []
     path_frames = "frames_csv/"
@@ -77,15 +83,12 @@ def plot_scatter3D(subject, emotion, landmarksInvolved, indexFrame):
     ax.set_axis_off()
     plt.show()
 
-
 def plot_subjects_results(data):
     """
-                    funzione che mostra il numero di occorrenze di ogni sequenza di frame su tutti i soggetti.
-                   - **Returns**:
-                   - **Value return** has type
-                   - Parameter **values**:
-                   - **Precondition**:
-        """
+                    This function shows the number of occurencies of each video sequence, for all the subjects in the dataset
+                   - Parameter **data**:
+
+    """
     list_axisX = []
     for key in data:
         list_axisX.append(str(data[key][0]))

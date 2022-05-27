@@ -8,8 +8,8 @@ import csv
 
 def extract_landmarks(dir,img):
     """
-       This Function takes in input the path of directory and image included in this directory,
-       extracts 468 landmarks and places the micro-expression_results in a csv file.
+       This Function takes in input the path of directory and an image, included in this directory. It then
+       extract 468 landmarks and places the results in a csv file.
           - **Returns**: null.
           - **Value return** has type null.
           - Parameter **values**: path of directory, image
@@ -18,12 +18,14 @@ def extract_landmarks(dir,img):
     filename = ('frames_csv/'+str(img)).replace('.png', '.csv')
     file = open(filename, 'w')
     writer = csv.writer(file)
-    writer.writerow(['x','y','z'])
+    writer.writerow(['x','y','z']) # header of the csv
 
+    # Reading of the image and landmark extraction through mediapipe TESS function.
     image = cv2.imread(os.path.join(dir, img))
     num_faces, keypoints = mpu.TESS(image)
 
-    # struttura dati che contiene i landmark divisi per righe (468x3)
+    # This structure represent the row which is then added to the csv.
+    # Every row contains a set of (X,Y,Z) coordinates indicating the position of the landmark in space.
     data = []
     for row in keypoints:
         data.append(row)
@@ -55,18 +57,20 @@ def get_directories(path_dataset):
          - Parameter **path_dataset**: path of the dataset, type string.
          - **Precondition**: Dataset must exists at path indicated. path_dataset type string
      """
-    # struttura dati che contiene i path delle singole directory di ogni singolo soggetto
+    # This data structure contains all the directory paths for every subject
     Dataset_folders = []
     for root, subdirs, files in os.walk(path_dataset):
         for d in subdirs:
-            # considero solo le sottocartelle dei singoli soggetti (iniziano con S)
+
+            # I just take into consideration the sub-folders of each subject (they start with the letter S)
             if (os.path.basename(d).startswith("S")):
-                # path fino alle sottocartelle singole (001, 002, 003, etc.)
+
+                # Creating the full path till the single sub-folders (001, 002, 003, etc.)
                 path_sdir = os.path.join(path_dataset, d)
                 for dir in os.listdir(path_sdir):
-                    # escludo .DS_STORE e le cartelle nascoste
+
+                    # Excluding .DS_STORE and all hidden folders
                     if (not dir.startswith(".")):
-                        # salvataggio all'interno della struttura dati
                         Dataset_folders.append(os.path.join(path_sdir, dir))
     return Dataset_folders
 
@@ -74,7 +78,7 @@ def landmarks_XYdirections(subject, indexFrame):
     """
      This function takes as input a person and a frame index of interest from which to obtain the distances and calculate
      the directions on the x and y axes of the landmarks with respect to the first frame.
-    Give +1 if it's the same direction, -1 otherwise.
+     Give +1 if it's the same direction, -1 otherwise.
          - **Returns**: list of landmarks directions.
          - **Value return** has type list.
          - Parameter **path_dataset**: subject, frame index of interest
@@ -82,12 +86,18 @@ def landmarks_XYdirections(subject, indexFrame):
      """
     path_dir = "frames_csv/"
 
+    # Here we take all the frames of video sequences where subject appears
     frames = [path_dir + x for x in sorted(os.listdir(path_dir)) if subject in x]
 
+    # XY directions are computed taking into consideratin first Frame and last frame.
     landmarks_directions = {}
     firstFrame = pd.read_csv(frames[0])
     lastFrame = pd.read_csv(frames[indexFrame])
 
+    # For every landmark in first and last frame we check if it moved along the same direction
+    # or if it has changed direction, by computing the Delta between the X and Y measurements.
+    # if It moved along the same direction, +1 is added into a list memorizing this information.
+    # if it moved along the oposite direction -1 is added otherwise.
     for i in range(468):
         directions = []
         if (lastFrame['x'][i] - firstFrame['x'][i]) > 0:
@@ -173,21 +183,26 @@ def process_threshold_landmarks(subject, emotion, frameSeq):
        """
     number_rows = len(frameSeq.axes[0])
 
+    # Here we take the global distances of the first frame and we flatten that list
     dist_ff = frameSeq.iloc[1:2, :468].values.tolist()
     fldist_ff = [item for sublist in dist_ff for item in sublist]
 
+    # Here we take the global distances of the last frame and we flatten that list
     dist_lf = frameSeq.iloc[number_rows-1:number_rows, :468].values.tolist()
     fldist_lf = [item for sublist in dist_lf for item in sublist]
 
+    # For every landmark we compute the Delta between the distances, appending it to list called
+    # delta_distances. We then proceed computing the mean of this distances. This value represents
+    # the threshold. All the landmarks whose deviation is greater than this threshold is considered meaningful
     delta_distances = []
     for i in range(0, 468):
         delta = fldist_lf[i] - fldist_ff[i]
         delta_distances.append(delta)
 
     threshold = statistics.mean(delta_distances)
-
     distancesOverT, significativeLandmarks = get_distances_overT(fldist_lf, threshold)
 
+    # DE - COMMENT IF PLOTS ARE NEEDED
     # plot a histogram or a 3D graph to visualize significant landmarks
     # plot.plot_significative_landmarks('Global Distances', subject, frameSeq, distancesOverT, significativeLandmarks)
     # plot.plot_scatter3D(subject[:8], emotion, significativeLandmarks)
