@@ -22,15 +22,7 @@ del emotion_dictionary[0]
 
 SPLIT_PERCENT = 0.8
 NUMBER_EMOTION = 7
-NUMBER_SPLIT = 10
-# columns = { 1: [0.888355, 0.873252, 0.873308, 0.867073, 0.833290, 0.877848, 0.830290],
-#             2: [0.873252, 0.874211, 0.866920, 0.867197, 0.860873, 0.866558, 0.821439],
-#             3: [0.873308, 0.866920, 0.889282, 0.864420, 0.869549, 0.869607, 0.812009],
-#             4: [0.867073, 0.867197, 0.864420, 0.868243, 0.844843, 0.861261, 0.835643],
-#             5: [0.833290, 0.860873, 0.869549, 0.844843, 0.932606, 0.835797, 0.761870],
-#             6: [0.877848, 0.866558, 0.869607, 0.861261, 0.835797, 0.870114, 0.819227],
-#             7: [0.830290, 0.821439, 0.812009, 0.835643, 0.761870, 0.819227, 0.831948]
-#             }
+NUMBER_IT = 10
 columns = {1: [0, 0, 0, 0, 0, 0, 0],
            2: [0, 0, 0, 0, 0, 0, 0],
            3: [0, 0, 0, 0, 0, 0, 0],
@@ -119,7 +111,6 @@ def mean_emotion_vector(emotion, distance_dir):
     return meanVector
 
 
-
 def max_occurence(em_df, idxmax_value):
     if idxmax_value[0] == idxmax_value[1] == idxmax_value[2]:
         return idxmax_value[0]
@@ -128,35 +119,31 @@ def max_occurence(em_df, idxmax_value):
     elif idxmax_value[1] == idxmax_value[2]:
         return idxmax_value[1]
     else:
-        count_max_index = {}
-        count_max_index[idxmax_value[0]] = 0;
-        count_max_index[idxmax_value[1]] = 0;
-        count_max_index[idxmax_value[2]] = 0
+        diff = 0
+        vector0 = em_df.iloc[idxmax_value[0] - 1]
+        vector1 = em_df.iloc[idxmax_value[1] - 1]
+        vector2 = em_df.iloc[idxmax_value[2] - 1]
 
-        for i in idxmax_value:
-            for j in range(1, 4):
-                for z in idxmax_value:
-                    if i == z: continue
-                    v1 = em_df.iloc[i - 1]
-                    v2 = em_df.iloc[z - 1]
-                    if v1[j] > v2[j]:
-                        count_max_index[i] += 1
+        for j in range(3):
+            diff += vector0[j+1] - vector1[j+1]
+        if diff > 0:
+            diff = 0
+            for j in range(3):
+                diff += vector1[j+1] - vector2[j+1]
+            if diff > 0:
+                return idxmax_value[1]
+            else:
+                return idxmax_value[2]
+        else:
+            diff = 0
+            for j in range(3):
+                diff += vector0[j+1] - vector2[j+1]
+            if diff > 0:
+                return idxmax_value[0]
+            else:
+                return idxmax_value[2]
 
-        max_idx = max(count_max_index, key=count_max_index.get)
-
-        for key in count_max_index:
-            if count_max_index[key] == count_max_index[max_idx] and key != max_idx:
-                v1 = em_df.iloc[max_idx - 1]
-                v2 = em_df.iloc[key - 1]
-                diff = 0
-                for j in range(3):
-                    diff += v1[j+1] - v2[j+1]
-                if diff > 0:
-                    return max_idx
-                else:
-                    return key
-
-        return max_idx
+        return max(count_max_index, key=count_max_index.get)
 
 
 def emotion_prediction(emotions_meanVector, test_sub, distance_dir):
@@ -220,7 +207,7 @@ def emotion_prediction(emotions_meanVector, test_sub, distance_dir):
         return 0
 
 mean_accuracy = []
-for number_split in range(NUMBER_SPLIT):
+for number_split in range(NUMBER_IT):
     emotion_training_dictionary = {}
     test_subjects = []
     for key in emotion_dictionary:
@@ -233,12 +220,11 @@ for number_split in range(NUMBER_SPLIT):
     for i in range(NUMBER_EMOTION):
         for j in range(NUMBER_EMOTION):
             df_weight[i + 1][j + 1] = get_emotion_similarities(i + 1, j + 1, distance_typedir)
-    print("\nDF_WEIGHT: \n", df_weight)
     # estrazione vettori media distanze di ogni emozione
     emotions_meanVector = {}
     for i in range(NUMBER_EMOTION):
         emotions_meanVector[i + 1] = mean_emotion_vector(emotion=i + 1, distance_dir=distance_typedir)
-    print("MEAN EMOTIONS: \n", emotions_meanVector)
+
     accuracy_per_emotion = {}
     emotion_prediction_results = []
     for s in test_subjects:
@@ -252,6 +238,6 @@ for number_split in range(NUMBER_SPLIT):
     print("EMOTIONS_SUCCESS: ", accuracy_per_emotion)
     mean_accuracy.append(accuracy)
 
-print("\nESEGUITE {} ITERAZIONI, L'ACCURATEZZA RISULTANTE È: {}".format(NUMBER_SPLIT, statistics.mean(mean_accuracy)))
+print("\nESEGUITE {} ITERAZIONI, L'ACCURATEZZA RISULTANTE È: {}".format(NUMBER_IT, statistics.mean(mean_accuracy)))
 
 
