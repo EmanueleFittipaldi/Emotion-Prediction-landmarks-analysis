@@ -5,14 +5,14 @@ from matplotlib import pyplot as plt
 import pandas as pd
 
 # Dataset path
-path_dataset = "Dataset/cohn-kanade-images"
+PATH_DATASET = "Dataset/cohn-kanade-images"
 # Lables path
-path_label = "Dataset/Emotion"
+PATH_LABEL = "Dataset/Emotion"
 
-Dataset_folders = utils.get_directories(path_dataset=path_dataset)
-Emotion_folders = utils.get_directories(path_dataset=path_label)
+DATASET_FOLDERS = utils.get_directories(path_dataset=PATH_DATASET)
+EMOTION_FOLDERS = utils.get_directories(path_dataset=PATH_LABEL)
 
-def process_landmarks(Dataset_folders):
+def process_landmarks():
     """
                     This function extracts all the landmarks from all the images contained in Dataset_folders
 
@@ -22,7 +22,7 @@ def process_landmarks(Dataset_folders):
                    - **Precondition**: Dataset_folder must be a string value. Dataset must exist.
     """
     # loop nelle diverse cartelle per andare ad ottenere le singole immagini dei soggetti ed estrarre i landmark
-    for dir in sorted(Dataset_folders):
+    for dir in sorted(DATASET_FOLDERS):
         for img in os.listdir(dir):
             utils.extract_landmarks(dir,img)
 
@@ -37,7 +37,7 @@ def missing_emotion_labels():
     """
 
     # First of all, we obtain all the folders where there is no emotion label
-    missing_EMlabels = [x for x in sorted(Emotion_folders) if len(x) == 0]
+    missing_EMlabels = [x for x in sorted(EMOTION_FOLDERS) if len(x) == 0]
 
     # In order to be more efficient, we proceed to plotting the image of the subject to be labelled.
     # We can then enter the emotion label using the terminal. After a subject is manually labelled,
@@ -47,7 +47,7 @@ def missing_emotion_labels():
     else:
         f = plt.figure()
         valueString = ".0000000e+00"
-        for dir in Dataset_folders:
+        for dir in DATASET_FOLDERS:
             for missing in missing_EMlabels:
                 if dir.find(missing[16:]) != -1:
                     all_imges = sorted(os.listdir(dir))
@@ -73,7 +73,7 @@ def missing_gender_labels():
     # In order to be more efficient, we proceed to plotting the image of the subject to be labelled.
     # We can then enter the Gender label using the terminal. After a subject is manually labelled,
     # a new .txt is creaded, containing the emotion label.
-    for dir in sorted(Dataset_folders):
+    for dir in sorted(DATASET_FOLDERS):
         all_imges = sorted(os.listdir(dir))
         filename = os.path.join(dir, all_imges[len(os.listdir(dir)) - 1]) \
             .replace("cohn-kanade-images", "Emotion") \
@@ -81,8 +81,8 @@ def missing_gender_labels():
 
         if not os.path.exists(filename):
             while (True):
-                # Uomo = 0
-                # Donna = 1
+                # MAN = 0
+                # WOMAN = 1
                 val = input("Enter value of gender: ")
                 if val != "" or val != 0 or val != 1:
                     f = open(filename, 'w')
@@ -117,7 +117,7 @@ def insert_labels_to_csv(path_label, path_GDcsv):
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CODE TO BE RUNNED ONLY ONCE
-# process_landmarks(Dataset_folders)
+# process_landmarks()
 missing_emotion_labels()
 missing_gender_labels()
 # insert_labels_to_csv("Dataset/Emotion", "Global_Distances")

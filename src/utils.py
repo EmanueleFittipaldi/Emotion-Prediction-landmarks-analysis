@@ -32,7 +32,7 @@ def extract_landmarks(dir,img):
     writer.writerows(data)
     file.close()
 
-def pvalue_test(vec1, vec2, alphaValue):
+def pvalue_test(vec1, vec2, alpha_value):
     """
      This Function takes two lists of numerical values representing two hypotetically distinguished distribuitions of values,
      and an alpha value. Through pvalue we compare these two distribuitions, returning if they are statistically different.
@@ -43,7 +43,7 @@ def pvalue_test(vec1, vec2, alphaValue):
          - **Precondition**: vec1,vec2 lists of numerical values. alphavalue a single float number
      """
     res = stats.ttest_ind(vec1, vec2).pvalue
-    if res <= alphaValue:
+    if res <= alpha_value:
         return True, res
     else:
         return False, res
@@ -58,7 +58,7 @@ def get_directories(path_dataset):
          - **Precondition**: Dataset must exists at path indicated. path_dataset type string
      """
     # This data structure contains all the directory paths for every subject
-    Dataset_folders = []
+    dataset_folders = []
     for root, subdirs, files in os.walk(path_dataset):
         for d in subdirs:
 
@@ -71,10 +71,10 @@ def get_directories(path_dataset):
 
                     # Excluding .DS_STORE and all hidden folders
                     if (not dir.startswith(".")):
-                        Dataset_folders.append(os.path.join(path_sdir, dir))
-    return Dataset_folders
+                        dataset_folders.append(os.path.join(path_sdir, dir))
+    return dataset_folders
 
-def landmarks_XYdirections(subject, indexFrame):
+def landmarks_XYdirections(subject, index_frame):
     """
      This function takes as input a person and a frame index of interest from which to obtain the distances and calculate
      the directions on the x and y axes of the landmarks with respect to the first frame.
@@ -91,8 +91,8 @@ def landmarks_XYdirections(subject, indexFrame):
 
     # XY directions are computed taking into consideratin first Frame and last frame.
     landmarks_directions = {}
-    firstFrame = pd.read_csv(frames[0])
-    lastFrame = pd.read_csv(frames[indexFrame])
+    first_frame = pd.read_csv(frames[0])
+    last_frame = pd.read_csv(frames[index_frame])
 
     # For every landmark in first and last frame we check if it moved along the same direction
     # or if it has changed direction, by computing the Delta between the X and Y measurements.
@@ -100,11 +100,11 @@ def landmarks_XYdirections(subject, indexFrame):
     # if it moved along the oposite direction -1 is added otherwise.
     for i in range(468):
         directions = []
-        if (lastFrame['x'][i] - firstFrame['x'][i]) > 0:
+        if (last_frame['x'][i] - first_frame['x'][i]) > 0:
             directions.append(+1)
         else:
             directions.append(-1)
-        if (lastFrame['y'][i] - firstFrame['y'][i]) > 0:
+        if (last_frame['y'][i] - first_frame['y'][i]) > 0:
             directions.append(+1)
         else:
             directions.append(-1)
@@ -131,7 +131,7 @@ def vector_similarity(v1, v2):
 
     return 1 - spatial.distance.cosine(v1, v2)
 
-def subjects_per_emotion(Dataset_Emotion, distance_name):
+def subjects_per_emotion(dataset_emotion, distance_name):
     """
     This Function takes as input a emotions dataset and distance name (to get the CSV files of the distance of interest),
     creates a dictionary in which the keys are the emotions and the values are the subjects of that key emotion.
@@ -141,7 +141,7 @@ def subjects_per_emotion(Dataset_Emotion, distance_name):
              - **Precondition**: distance name type string.
          """
     emotion_dictionary = {}
-    for dir in Dataset_Emotion:
+    for dir in dataset_emotion:
         for file in os.listdir(dir):
             if os.path.basename(file).find('emotion') != -1:
                 subject = file[:8] + distance_name + ".csv"
@@ -172,7 +172,7 @@ def get_distances_overT(frame, threshold):
             landmarks.append(i)
     return distances_overT, landmarks
 
-def process_threshold_landmarks(subject, emotion, frameSeq):
+def process_threshold_landmarks(subject, emotion, frame_seq):
     """
     This Function takes as input a sequence of frames of the subject of interest, and calculate a threshold.
     The threshold is the average of the differences between the distances.
@@ -181,14 +181,14 @@ def process_threshold_landmarks(subject, emotion, frameSeq):
           - Parameter **values**:
           - **Precondition**:
        """
-    number_rows = len(frameSeq.axes[0])
+    number_rows = len(frame_seq.axes[0])
 
     # Here we take the global distances of the first frame and we flatten that list
-    dist_ff = frameSeq.iloc[1:2, :468].values.tolist()
+    dist_ff = frame_seq.iloc[1:2, :468].values.tolist()
     fldist_ff = [item for sublist in dist_ff for item in sublist]
 
     # Here we take the global distances of the last frame and we flatten that list
-    dist_lf = frameSeq.iloc[number_rows-1:number_rows, :468].values.tolist()
+    dist_lf = frame_seq.iloc[number_rows - 1:number_rows, :468].values.tolist()
     fldist_lf = [item for sublist in dist_lf for item in sublist]
 
     # For every landmark we compute the Delta between the distances, appending it to list called
@@ -200,11 +200,11 @@ def process_threshold_landmarks(subject, emotion, frameSeq):
         delta_distances.append(delta)
 
     threshold = statistics.mean(delta_distances)
-    distancesOverT, significativeLandmarks = get_distances_overT(fldist_lf, threshold)
+    distances_over_t, significative_landmarks = get_distances_overT(fldist_lf, threshold)
 
     # DE - COMMENT IF PLOTS ARE NEEDED
     # plot a histogram or a 3D graph to visualize significant landmarks
-    # plot.plot_significative_landmarks('Global Distances', subject, frameSeq, distancesOverT, significativeLandmarks)
-    # plot.plot_scatter3D(subject[:8], emotion, significativeLandmarks)
+    # plot.plot_significative_landmarks('Global Distances', subject, frameSeq, distances_over_t, significative_landmarks)
+    # plot.plot_scatter3D(subject[:8], emotion, significative_landmarks)
 
-    return distancesOverT, significativeLandmarks
+    return distances_over_t, significative_landmarks

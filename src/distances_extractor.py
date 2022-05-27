@@ -5,7 +5,7 @@ from scipy import spatial
 from scipy.spatial import distance
 
 # Path of the folder containing all the landmarks csv's for every videosequence
-path_fcsv = "frames_csv"
+PATH_FCSV = "frames_csv"
 
 def gloabl_distances(path_globaldcsv, namePath, nameDist):
     """
@@ -20,13 +20,13 @@ def gloabl_distances(path_globaldcsv, namePath, nameDist):
                     and the choosen distance.
                   - **Precondition**: parameters must be string values. parameter nameDist must be 'EUCLIDEAN' or 'MANHATTAN'
        """
-    listDistances = ['EUCLIDEAN', 'MANHATTAN']
-    if nameDist in listDistances:
+    list_distances = ['EUCLIDEAN', 'MANHATTAN']
+    if nameDist in list_distances:
         if not os.path.exists(path_globaldcsv):
             os.mkdir(path_globaldcsv)
 
         # creating a csv for every emotion of every subject
-        for file in os.listdir(path_fcsv):
+        for file in os.listdir(PATH_FCSV):
             if file.startswith("."): continue
 
             # Making of the path in order to create the csv:
@@ -39,10 +39,10 @@ def gloabl_distances(path_globaldcsv, namePath, nameDist):
             # csv with the first row containing all zeroes. These csv will follow this format:
             # every row is going to represent a different frame, and every column a different landmark.
             if not os.path.exists(path_file):
-                firstEmptyRow = [0] * 468
+                first_empty_row = [0] * 468
                 f = open(path_file, 'w')
                 writer = csv.writer(f)
-                writer.writerow(firstEmptyRow)
+                writer.writerow(first_empty_row)
                 f.close()
 
         # Up to this point we should have all the csv created and initialized.
@@ -52,17 +52,17 @@ def gloabl_distances(path_globaldcsv, namePath, nameDist):
 
             # This list is going to contain all the frames of a video sequence about a specific subject that
             # we have to analyze in order to extract the distances.
-            frameToAnalyze = []
-            for f in os.listdir(path_fcsv):
+            frame_to_analyze = []
+            for f in os.listdir(PATH_FCSV):
                 if f.find(filename) != -1:
-                    frameToAnalyze.append(os.path.join(path_fcsv,f))
-            frameToAnalyze = sorted(frameToAnalyze)
+                    frame_to_analyze.append(os.path.join(PATH_FCSV, f))
+            frame_to_analyze = sorted(frame_to_analyze)
 
             # In order to process the frames more easily, we open them as Dataframes. Since we are computing
             # global distances, we need to compare the position of all the landmarks in the frame interval 2-N
             # to the position of the landmarks in the first frame. So here I am reading the first frame.
-            first_frame = pd.read_csv(frameToAnalyze[0])
-            for data in frameToAnalyze[1:]:
+            first_frame = pd.read_csv(frame_to_analyze[0])
+            for data in frame_to_analyze[1:]:
                 current_frame = pd.read_csv(data)
                 distances = []
                 for i in range(len(first_frame)):
@@ -83,7 +83,7 @@ def gloabl_distances(path_globaldcsv, namePath, nameDist):
     else:
          print("Choose between computing Euclidean or Manhattan distances")
 
-def local_distances(nameDist):
+def local_distances(name_dist):
     """
                   This function compute the local distances on every video sequence. These distances are
                   computed for every landmark, by comparing the position of the landmark in the frame i-1
@@ -97,34 +97,34 @@ def local_distances(nameDist):
         """
 
     # Paths of the csv containing the landmark's position for every video sequence
-    Csv_files = sorted(os.listdir(path_fcsv))
+    csv_files = sorted(os.listdir(PATH_FCSV))
 
     # Creating and initializing a new csv for every subject. These csv will contain the distances
     # for every landmark from the i-1 frame to frame i.
-    currentSubject = ""
-    for frame in Csv_files:
-        if currentSubject is not frame[0:9]:
-            currentSubject = frame[0:9]
-            filename = 'Local_Distances/' + frame[0:9] + 'LD' + '_' + nameDist+'.csv'
+    current_subject = ""
+    for frame in csv_files:
+        if current_subject is not frame[0:9]:
+            current_subject = frame[0:9]
+            filename = 'Local_Distances/' + frame[0:9] + 'LD' + '_' + name_dist + '.csv'
             f = open(filename, 'w')
             writer = csv.writer(f)
-            FirstEmptyRow = [0] * 468
-            writer.writerow(FirstEmptyRow)
+            first_empty_row = [0] * 468
+            writer.writerow(first_empty_row)
             f.close()
 
-    for VideoSequence in sorted(os.listdir("Local_Distances/")):
+    for video_sequence in sorted(os.listdir("Local_Distances/")):
 
        # Since the Local_Distances folder may contain different csv for different metrics, I need to check
        # if I am opening the right csv.
-       if nameDist in VideoSequence:
-        LocalDistanceCSV = open("Local_Distances/" + VideoSequence, 'a')
-        writer = csv.writer(LocalDistanceCSV)
+       if name_dist in video_sequence:
+        local_distance_csv = open("Local_Distances/" + video_sequence, 'a')
+        writer = csv.writer(local_distance_csv)
 
         # For every Videosequnce about a subject I need to gather all the frames in order to analyze them
-        frameToAnalyze = []
-        for frame in Csv_files:
-            if VideoSequence[0:8] in frame:
-                frameToAnalyze.append(frame)
+        frame_to_analyze = []
+        for frame in csv_files:
+            if video_sequence[0:8] in frame:
+                frame_to_analyze.append(frame)
 
 
         i = 0
@@ -132,28 +132,28 @@ def local_distances(nameDist):
 
     # Computing the distances by taking the i-1 frame and i frame, and sliding this window
     # till the end of the videosequence
-    while j < len(frameToAnalyze):
-        rowOfDistances = []
-        previousFrame= os.path.join("frames_csv/", frameToAnalyze[i])
-        currentFrame= os.path.join("frames_csv/", frameToAnalyze[j])
-        previousFrame_Df = pd.read_csv(previousFrame)
-        currentFrame_Df = pd.read_csv(currentFrame)
+    while j < len(frame_to_analyze):
+        row_of_distances = []
+        previous_frame = os.path.join(PATH_FCSV+"/", frame_to_analyze[i])
+        current_frame = os.path.join(PATH_FCSV+"/", frame_to_analyze[j])
+        previous_frame_df = pd.read_csv(previous_frame)
+        current_frame_df = pd.read_csv(current_frame)
 
-        for k in range(previousFrame_Df.shape[0]):
-            landmarkPrecedente = list(previousFrame_Df.iloc[k])
-            landmarkCorrente = list(currentFrame_Df.iloc[k])
+        for k in range(previous_frame_df.shape[0]):
+            landmark_precedente = list(previous_frame_df.iloc[k])
+            landmark_corrente = list(current_frame_df.iloc[k])
 
-            if nameDist == "EUCLIDEAN":
-                rowOfDistances.append(distance.euclidean(landmarkPrecedente, landmarkCorrente))
-            elif nameDist == "MANHATTAN":
-                rowOfDistances.append(distance.cityblock(landmarkPrecedente, landmarkCorrente))
+            if name_dist == "EUCLIDEAN":
+                row_of_distances.append(distance.euclidean(landmark_precedente, landmark_corrente))
+            elif name_dist == "MANHATTAN":
+                row_of_distances.append(distance.cityblock(landmark_precedente, landmark_corrente))
             else:
                 print("EUCLIDEAN or MANHATTAN only")
-        writer.writerow(rowOfDistances)
+        writer.writerow(row_of_distances)
         i += 1
         j += 1
 
-    LocalDistanceCSV.close()
+    local_distance_csv.close()
 
 
 # FUNCTION CALLS TO RUN ONLY ONCE:
